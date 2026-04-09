@@ -1,68 +1,99 @@
-// ПРОВЕРКА ПОДКЛЮЧЕНИЯ
-console.log("App.js запущен успешно");
 
-// Твои настройки Firebase (ВСТАВЬ СВОИ ДАННЫЕ ТУТ)
-const firebaseConfig = {
-    apiKey: "ТВОЙ_КЛЮЧ",
-    authDomain: "padel-riga.firebaseapp.com",
-    databaseURL: "https://padel-riga-default-rtdb.firebaseio.com",
-    projectId: "padel-riga",
-    storageBucket: "padel-riga.appspot.com",
-    messagingSenderId: "123",
-    appId: "123"
-};
-
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-}
-
-const db = firebase.database();
+/**
+ * PADEL CLUB — TEST DRIVE VERSION
+ * Работает без внешней базы для проверки дизайна и логики
+ */
 
 const App = {
-    init: function() {
-        this.renderBottomNav();
-        this.listenTournaments();
+    // Временные данные (вместо Firebase)
+    data: {
+        tournaments: {
+            "t1": {
+                name: "Вечерний Падел Рига",
+                startDate: "2026-04-15 19:00",
+                maxPlayers: 2,
+                participants: {
+                    "p1": { name: "Николай", status: "approved" }
+                }
+            },
+            "t2": {
+                name: "Блиц-Турнир (Заблокирован)",
+                startDate: "2026-04-09 20:00", // Менее 24 часов от текущей даты
+                maxPlayers: 16,
+                participants: {}
+            }
+        }
     },
 
-    listenTournaments: function() {
-        db.ref('tournaments').on('value', (snap) => {
-            const list = document.getElementById('tournament-list');
-            const data = snap.val();
-            if(!data) { list.innerHTML = "Турниров пока нет"; return; }
+    init() {
+        console.log("Test Mode Active");
+        this.renderNav();
+        this.render();
+    },
+
+    render() {
+        const container = document.getElementById('tournament-list');
+        const tournaments = this.data.tournaments;
+        
+        container.innerHTML = Object.keys(tournaments).map(id => {
+            const t = tournaments[id];
+            const parts = Object.values(t.participants);
+            const max = t.maxPlayers;
+            const isFull = parts.length >= max;
             
-            list.innerHTML = Object.keys(data).map(id => {
-                const t = data[id];
-                const parts = t.participants ? Object.values(t.participants) : [];
-                const max = t.maxPlayers || 16;
-                const isFull = parts.length >= max;
-                
-                return `
-                <div class="tournament-card">
-                    <h3>${t.name}</h3>
-                    <p>Игроков: ${parts.length}/${max}</p>
-                    ${isFull ? `<p style="color:#00E5FF">В очереди: ${parts.filter(p=>p.status==='queue').length}</p>` : ''}
-                    <button class="btn-manage" onclick="App.join('${id}')">
-                        ${isFull ? 'ВСТАТЬ В ОЧЕРЕДЬ' : 'ЗАПИСАТЬСЯ'}
-                    </button>
-                </div>`;
-            }).join('');
-        });
+            // Логика 24 часов
+            const start = new Date(t.startDate).getTime();
+            const now = new Date("2026-04-09 18:00").getTime(); // Фиксация времени для теста
+            const isLocked = (start - now) < (24 * 60 * 60 * 1000);
+
+            return `
+                <div class="tournament-card ${isLocked ? 'locked' : ''}">
+                    <div style="font-weight:bold; font-size:20px; color:#39FF14">${t.name}</div>
+                    <div class="occupancy" style="margin: 10px 0;">
+                        Игроки: ${parts.length}/${max}
+                        ${isFull ? `<span class="queue-tag" style="color:#00E5FF"> + В очереди: ${parts.filter(p=>p.status==='queue').length}</span>` : ''}
+                    </div>
+                    <div style="font-size:12px; color:#888; margin-bottom:15px;">📅 ${t.startDate}</div>
+                    
+                    ${isLocked 
+                        ? `<button class="btn-main btn-locked" style="background:#333; color:#FF4B4B; border:1px solid #FF4B4B; width:100%; padding:12px; border-radius:12px;">РЕГИСТРАЦИЯ ЗАКРЫТА</button>` 
+                        : `<button class="btn-main" onclick="App.join('${id}')" style="background:#39FF14; color:black; border:none; width:100%; padding:12px; border-radius:12px; font-weight:bold;">
+                            ${isFull ? 'ВСТАТЬ В ОЧЕРЕДЬ' : 'ЗАПИСАТЬСЯ'}
+                           </button>`
+                    }
+                </div>
+            `;
+        }).join('');
     },
 
-    renderBottomNav: function() {
-        document.getElementById('bottom-nav').innerHTML = `
-            <div class="nav-item">🏆</div>
-            <div class="nav-item">🎾</div>
-            <div class="fab-container"><div class="fab">+</div></div>
-            <div class="nav-item">📊</div>
-            <div class="nav-item">👥</div>
+    join(id) {
+        const t = this.data.tournaments[id];
+        const name = prompt("Ваше имя для теста:");
+        if (!name) return;
+
+        const isFull = Object.values(t.participants).length >= t.maxPlayers;
+        const newId = "p" + Date.now();
+        
+        t.participants[newId] = {
+            name: name,
+            status: isFull ? 'queue' : 'approved'
+        };
+
+        alert(isFull ? "Мест нет! Вы добавлены в очередь." : "Успешная запись!");
+        this.render();
+    },
+
+    renderNav() {
+        const nav = document.getElementById('bottom-nav');
+        nav.innerHTML = `
+            <div style="font-size:24px">🏆</div>
+            <div style="font-size:24px">🎾</div>
+            <div class="fab" style="background:#39FF14; width:50px; height:50px; border-radius:15px; display:flex; align-items:center; justify-content:center; color:black; font-weight:bold; margin-top:-20px;">+</div>
+            <div style="font-size:24px">📊</div>
+            <div style="font-size:24px">👥</div>
         `;
-    },
-
-    join: function(id) {
-        alert("Заглушка: Запись на турнир " + id);
-        // Здесь будет логика записи, которую мы обсуждали
     }
 };
 
-App.init();
+document.addEventListener('DOMContentLoaded', () => App.init());
+
