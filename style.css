@@ -1,0 +1,67 @@
+:root {
+    --bg-color: #0F1215;
+    --card-bg: #1A1D21;
+    --neon-green: #39FF14;
+    --text-white: #FFFFFF;
+    --text-gray: #A0A0A0;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-white);
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding-bottom: 80px;
+}
+
+.neon-text { color: var(--neon-green); text-shadow: 0 0 10px rgba(57, 255, 20, 0.5); padding: 20px; }
+
+.tournament-card {
+    background: var(--card-bg);
+    border: 1px solid rgba(57, 255, 20, 0.2);
+    border-radius: 16px;
+    margin: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+
+.tournament-card.locked { opacity: 0.6; border-color: #ff4b4b; }
+
+.btn-manage {
+    background: var(--neon-green);
+    color: black;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-weight: bold;
+    width: 100%;
+    margin-top: 15px;
+    cursor: pointer;
+}
+
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 70px;
+    background: rgba(26, 29, 33, 0.9);
+    backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-top: 1px solid rgba(57, 255, 20, 0.2);
+}
+
+.fab-container { position: relative; top: -20px; text-align: center; }
+.fab {
+    background: var(--neon-green);
+    width: 56px;
+    height: 56px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: black;
+    box-shadow: 0 0 20px rgba(57, 255, 20, 0.4);
+}
