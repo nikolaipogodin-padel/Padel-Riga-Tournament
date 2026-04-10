@@ -1,153 +1,107 @@
-// ГЕНЕРАЦИЯ ДАННЫХ ПРИ СТАРТЕ
-const mockData = {
-    myTournaments: [
-        { id: 1, title: 'Autumn Slam 2026', date: '19 Апр', time: '10:00', loc: 'Riga, Skunste', status: 'LIVE', icon: '🎾', players: '16/16' },
-        { id: 2, title: 'Riga Evening Open', date: '21 Апр', time: '19:00', loc: 'Enri Padel', status: 'OPEN', icon: '🌙', players: '8/16' }
+const STORE = {
+    tournaments: [
+        { id: 1, title: "Autumn Slam 2026", date: "19 Апр", time: "10:00", loc: "Skunste Riga", players: "16/16", status: "LIVE", type: "my" },
+        { id: 2, title: "Evening Mix-Up", date: "21 Апр", time: "19:00", loc: "Enri Padel", players: "8/16", status: "OPEN", type: "my" },
+        { id: 3, title: "Tallinn Masters", date: "05 Май", time: "11:30", loc: "Tallinn Center", players: "4/32", status: "OPEN", type: "available" },
+        { id: 4, title: "Kaunas Cup", date: "12 Май", time: "12:00", loc: "Padel Hub", players: "12/24", status: "OPEN", type: "available" },
+        { id: 5, title: "Riga Morning", date: "15 Май", time: "09:00", loc: "Skunste Riga", players: "0/16", status: "CLOSED", type: "available" }
     ],
-    availableTournaments: [
-        { id: 3, title: 'Tallinn Padel Cup', date: '05 Май', time: '11:30', loc: 'Tallinn Center', status: 'OPEN', icon: '🇪🇪', players: '4/32' },
-        { id: 4, title: 'Kaunas Challenge', date: '12 Май', time: '12:00', loc: 'Kaunas Arena', status: 'OPEN', icon: '🇱🇹', players: '12/24' },
-        { id: 5, title: 'Vilnius Masters', date: '20 Май', time: '10:00', loc: 'Vilnius Padel', status: 'CLOSED', icon: '🏆', players: '32/32' }
-    ]
-};
-
-const state = {
     currentScreen: 'dashboard',
-    activeTournament: null
+    activeId: null
 };
 
-// РОУТИНГ
-window.switchScreen = (screenId, params = null) => {
-    state.currentScreen = screenId;
-    if (params) state.activeTournament = params;
-    
-    document.querySelectorAll('.nav-item').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.screen === screenId);
-    });
-    render();
-    window.scrollTo(0,0);
+window.router = {
+    navigate(screen, id = null) {
+        STORE.currentScreen = screen;
+        STORE.activeId = id;
+        
+        // Скрываем заголовок на экране деталей
+        const header = document.getElementById('main-header');
+        if (header) header.style.display = (screen === 'details') ? 'none' : 'flex';
+        
+        this.updateNavUI();
+        render();
+    },
+    updateNavUI() {
+        document.querySelectorAll('.nav-item').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.screen === STORE.currentScreen);
+        });
+    }
 };
 
-// РЕНДЕР КОМПОНЕНТОВ
-const renderTournamentCard = (t) => `
-    <div onclick="switchScreen('tournament_details', ${t.id})" class="scroll-item glass-card p-6 card-gradient-border flex flex-col justify-between min-h-[220px]">
-        <div>
-            <div class="flex justify-between items-start mb-4">
-                <span class="text-3xl">${t.icon}</span>
-                <span class="${t.status === 'LIVE' ? 'bg-green-500 text-black' : 'bg-blue-500/20 text-blue-400'} text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-widest">
-                    ${t.status}
-                </span>
-            </div>
-            <h3 class="text-xl font-bold leading-tight mb-1">${t.title}</h3>
-            <p class="text-slate-400 text-xs flex items-center gap-1">
-                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                ${t.loc}
-            </p>
-        </div>
-        <div class="mt-6 flex justify-between items-center border-t border-white/5 pt-4">
-            <div class="text-[10px] text-slate-500 uppercase font-bold tracking-tighter">
-                ${t.date} • ${t.time}
-            </div>
-            <div class="text-[10px] text-slate-300 font-bold">${t.players}</div>
-        </div>
-    </div>
-`;
-
-const render = () => {
-    const container = document.getElementById('screen-content');
-    
-    if (state.currentScreen === 'dashboard' || state.currentScreen === 'tournaments') {
-        container.innerHTML = `
-            <div class="p-6">
-                <h1 class="text-3xl font-black mb-8 italic uppercase tracking-tighter">Padel <span class="text-green-500">Riga</span></h1>
-                
-                <section class="mb-10">
-                    <div class="flex justify-between items-end mb-4 px-2">
-                        <h2 class="text-lg font-extrabold uppercase tracking-tight text-white/90">Мои Турниры</h2>
-                        <span class="text-blue-500 text-xs font-bold uppercase cursor-pointer">Все</span>
-                    </div>
-                    <div class="horizontal-scroll">
-                        ${mockData.myTournaments.map(t => renderTournamentCard(t)).join('')}
-                    </div>
-                </section>
-
-                <section>
-                    <div class="flex justify-between items-end mb-4 px-2">
-                        <h2 class="text-lg font-extrabold uppercase tracking-tight text-white/90">Доступные</h2>
-                        <span class="text-blue-500 text-xs font-bold uppercase cursor-pointer">Все</span>
-                    </div>
-                    <div class="horizontal-scroll">
-                        ${mockData.availableTournaments.map(t => renderTournamentCard(t)).join('')}
-                    </div>
-                </section>
+const UI = {
+    Card(t) {
+        const isLive = t.status === 'LIVE';
+        return `
+            <div onclick="router.navigate('details', ${t.id})" class="scroll-item glass-card p-6 ${isLive ? 'border-green-500/30' : 'border-white/10'}">
+                <div class="flex justify-between items-start mb-6">
+                    <div class="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-2xl">🎾</div>
+                    <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${isLive ? 'bg-green-500 text-black' : 'bg-white/10 text-slate-400'}">
+                        ${t.status}
+                    </span>
+                </div>
+                <h3 class="text-xl font-black mb-1 tracking-tight">${t.title}</h3>
+                <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-6">📍 ${t.loc}</p>
+                <div class="flex justify-between border-t border-white/5 pt-4">
+                    <div><p class="text-[9px] text-slate-600 uppercase font-black tracking-tighter">Когда</p><p class="text-xs font-bold">${t.date}</p></div>
+                    <div class="text-right"><p class="text-[9px] text-slate-600 uppercase font-black tracking-tighter">Слоты</p><p class="text-xs font-bold">${t.players}</p></div>
+                </div>
             </div>
         `;
     }
+};
 
-    if (state.currentScreen === 'tournament_details') {
-        const t = [...mockData.myTournaments, ...mockData.availableTournaments].find(x => x.id == state.activeTournament);
-        container.innerHTML = `
-            <div class="animate-in fade-in slide-in-from-bottom-4 duration-300">
-                <div class="relative h-48 w-full overflow-hidden mb-6">
-                    <div class="absolute inset-0 bg-gradient-to-t from-[#05070a] to-transparent z-10"></div>
-                    <img src="https://images.unsplash.com/photo-1626224484214-4051d4bc61ae?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover opacity-40">
-                    <button onclick="switchScreen('dashboard')" class="absolute top-6 left-6 z-20 bg-black/50 p-3 rounded-2xl border border-white/10">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"></path></svg>
+const Screens = {
+    dashboard() {
+        const my = STORE.tournaments.filter(t => t.type === 'my');
+        const available = STORE.tournaments.filter(t => t.type === 'available');
+        return `
+            <div class="fade-in">
+                <div class="mb-8">
+                    <h2 class="px-6 text-xs font-black uppercase text-slate-500 tracking-[0.2em] mb-4">Мои события</h2>
+                    <div class="horizontal-scroll">${my.map(t => UI.Card(t)).join('')}</div>
+                </div>
+                <div>
+                    <h2 class="px-6 text-xs font-black uppercase text-slate-500 tracking-[0.2em] mb-4">Доступные турниры</h2>
+                    <div class="horizontal-scroll">${available.map(t => UI.Card(t)).join('')}</div>
+                </div>
+            </div>
+        `;
+    },
+    details(id) {
+        const t = STORE.tournaments.find(x => x.id === id);
+        return `
+            <div class="fade-in relative">
+                <div class="h-72 w-full relative">
+                    <img src="https://images.unsplash.com/photo-1554068865-24cecd4e34b8?q=80&w=1000" class="w-full h-full object-cover opacity-40">
+                    <div class="absolute inset-0 bg-gradient-to-t from-[#05070a] to-transparent"></div>
+                    <button onclick="router.navigate('dashboard')" class="absolute top-10 left-6 w-12 h-12 bg-black/40 backdrop-blur-xl rounded-2xl border border-white/10 flex items-center justify-center">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="3"></path></svg>
                     </button>
                 </div>
-                
-                <div class="px-6">
-                    <div class="mb-8">
-                        <h2 class="text-3xl font-black mb-2">${t.title}</h2>
-                        <div class="flex gap-4 text-slate-400 text-xs font-bold uppercase tracking-widest">
-                            <span>📅 ${t.date}</span>
-                            <span>⏰ ${t.time}</span>
-                            <span>📍 ${t.loc}</span>
-                        </div>
+                <div class="px-6 -mt-10 relative">
+                    <h2 class="text-3xl font-black mb-4 tracking-tighter">${t.title}</h2>
+                    <div class="flex gap-2 mb-8">
+                        <span class="bg-blue-500/20 text-blue-400 text-[10px] px-3 py-1 rounded-lg border border-blue-500/20 font-black uppercase tracking-widest">${t.loc}</span>
+                        <span class="bg-white/5 text-white/50 text-[10px] px-3 py-1 rounded-lg border border-white/10 font-black uppercase tracking-widest">${t.date}</span>
                     </div>
-
-                    <div class="glass-card p-6 mb-6 card-gradient-border">
-                        <h4 class="text-sm font-bold uppercase tracking-widest text-slate-500 mb-4 italic">Статус участника</h4>
-                        <div class="flex items-center gap-4 mb-6">
-                            <div class="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center text-blue-500 font-bold text-xl">NP</div>
-                            <div>
-                                <div class="font-bold">Николай Погодин</div>
-                                <div class="text-[10px] text-slate-500 uppercase tracking-widest">Platinum Member</div>
-                            </div>
-                        </div>
-                        <button class="w-full bg-green-500 text-black font-black py-4 rounded-2xl uppercase shadow-[0_0_30px_rgba(34,197,94,0.3)] active:scale-95 transition-all">
-                            Зарегистрироваться
-                        </button>
+                    <div class="glass-card p-6 mb-6">
+                        <p class="text-slate-400 text-sm leading-relaxed mb-6 italic">Турнир формата Mix-Up. Одиночная регистрация, случайная смена напарников каждый круг. Победитель определяется по личному зачету.</p>
+                        <button class="w-full bg-green-500 text-black font-black py-4 rounded-2xl uppercase shadow-lg shadow-green-500/20">Регистрация</button>
                     </div>
                 </div>
             </div>
         `;
-    }
-
-    if (state.currentScreen === 'live') {
-        container.innerHTML = `
-            <div class="p-6">
-                <h2 class="text-2xl font-black mb-6 italic uppercase tracking-tighter">Live Flow</h2>
-                <div class="glass-card p-6 border-green-500/30 border">
-                    <div class="flex justify-between items-center mb-6">
-                        <span class="text-[10px] font-black text-green-500 tracking-[0.2em] uppercase">Матч в эфире</span>
-                        <span class="text-xs text-slate-500 font-bold tracking-tighter">Корт 1</span>
-                    </div>
-                    <div class="flex justify-between items-center mb-8">
-                        <div class="text-center flex-1 font-bold">Николай / Андрей</div>
-                        <div class="text-3xl font-black px-4 text-green-500">6:3</div>
-                        <div class="text-center flex-1 font-bold opacity-40 italic">Виктор / Ghost</div>
-                    </div>
-                    <button class="w-full border border-white/10 py-3 rounded-xl text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-white transition-all">
-                        Внести счет
-                    </button>
-                </div>
-            </div>
-        `;
-    }
+    },
+    live() { return `<div class="p-20 text-center opacity-30 font-black uppercase tracking-widest fade-in">Здесь будет сетка матчей</div>`; },
+    stats() { return `<div class="p-20 text-center opacity-30 font-black uppercase tracking-widest fade-in">Рейтинг игроков</div>`; },
+    tournaments() { return this.dashboard(); }
 };
 
-// ИНИЦИАЛИЗАЦИЯ
-document.addEventListener('DOMContentLoaded', () => {
-    switchScreen('dashboard');
-});
+function render() {
+    const content = document.getElementById('screen-content');
+    const screen = STORE.currentScreen;
+    content.innerHTML = (screen === 'details') ? Screens.details(STORE.activeId) : Screens[screen]();
+}
+
+document.addEventListener('DOMContentLoaded', () => router.navigate('dashboard'));
