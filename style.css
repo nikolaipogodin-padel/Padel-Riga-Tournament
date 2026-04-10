@@ -1,4 +1,3 @@
-/* Custom Styles for Padel Riga */
 :root {
     --neon-blue: #3b82f6;
     --neon-green: #22c55e;
@@ -7,45 +6,59 @@
 
 body {
     background-color: var(--bg-dark);
-    -webkit-tap-highlight-color: transparent;
+    user-select: none;
 }
 
-/* Glassmorphism Cards */
+/* Карточки в стиле эталона */
 .glass-card {
-    background: rgba(15, 23, 42, 0.6);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 24px;
-    transition: transform 0.2s ease;
+    background: linear-gradient(145deg, rgba(30, 41, 59, 0.4), rgba(15, 23, 42, 0.6));
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 28px;
+    box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
 }
 
-/* Active Nav Item Glow */
-.nav-item.active {
-    color: var(--neon-blue);
+.card-gradient-border {
+    position: relative;
+}
+.card-gradient-border::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 28px;
+    padding: 1px;
+    background: linear-gradient(to bottom right, rgba(255,255,255,0.1), transparent, rgba(34, 197, 94, 0.2));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
 }
 
+/* Горизонтальный скролл */
+.horizontal-scroll {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 16px;
+    padding: 10px 4px 20px 4px;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.horizontal-scroll::-webkit-scrollbar { display: none; }
+
+.scroll-item {
+    scroll-snap-align: center;
+    min-width: 280px;
+    max-width: 320px;
+}
+
+/* Навигация */
 .nav-item.active svg {
-    filter: drop-shadow(0 0 8px var(--neon-blue));
+    filter: drop-shadow(0 0 10px currentColor);
 }
 
-.nav-item[data-screen="live"].active svg {
-    filter: drop-shadow(0 0 8px var(--neon-green));
-}
-
-/* Score Input Pulse */
-.score-input:focus {
-    border-color: var(--neon-blue);
-    box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
-}
-
-/* Animation for Tabs */
 .tab-active {
-    background-color: var(--neon-green);
+    background: var(--neon-green);
     color: black;
     box-shadow: 0 0 20px rgba(34, 197, 94, 0.4);
-}
-
-/* Hide scrollbars */
-::-webkit-scrollbar {
-    display: none;
 }
