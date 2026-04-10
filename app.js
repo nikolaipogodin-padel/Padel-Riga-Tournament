@@ -1,141 +1,135 @@
 const App = {
     state: {
-        currentTab: 'tournaments',
-        editingMatchId: null,
-        tournaments: {
-            my: [
-                { id: "m1", court: "1", status: "finished", p1: "Николай / Андрей", p2: "Виктор / Дмитрий", s1: 6, s2: 4, winner: "Николай / Андрей" },
-                { id: "m2", court: "2", status: "live", p1: "Алексей / Сергей", p2: "Игорь / Максим", s1: 3, s2: 2 }
-            ],
-            available: [
-                { id: "t_new1", name: "Riga Weekend Cup", date: "15 Апреля", players: "12/16" },
-                { id: "t_new2", name: "Padel Night Masters", date: "18 Апреля", players: "4/16" }
-            ]
-        }
+        tab: 'tournaments',
+        editingId: null,
+        myGames: [
+            { id: 1, p1: "Николай / Андрей", p2: "Виктор / Дмитрий", s1: 6, s2: 4, live: true },
+            { id: 2, p1: "Алексей / Сергей", p2: "Игорь / Максим", s1: 0, s2: 0, live: false }
+        ],
+        others: [
+            { id: 101, name: "Riga Spring Open", date: "12.04", players: "14/16" },
+            { id: 102, name: "Padel Battle", date: "15.04", players: "8/16" }
+        ]
     },
 
     init() {
         this.render();
     },
 
-    switchTab(tab) {
-        this.state.currentTab = tab;
-        this.state.editingMatchId = null;
+    setTab(t) {
+        this.state.tab = t;
+        this.state.editingId = null;
         this.render();
     },
 
-    manageMatch(matchId) {
-        this.state.editingMatchId = matchId;
-        this.render();
-    },
-
-    saveResult() {
-        const m = this.state.tournaments.my.find(m => m.id === this.state.editingMatchId);
-        if (m.s1 > m.s2) m.winner = m.p1;
-        else if (m.s2 > m.s1) m.winner = m.p2;
-        m.status = "finished";
-        this.state.editingMatchId = null;
+    openManage(id) {
+        this.state.editingId = id;
         this.render();
     },
 
     render() {
-        const container = document.getElementById('main-content');
-        
-        if (this.state.editingMatchId) {
-            this.renderManageScreen(container);
+        const root = document.getElementById('main-content');
+        root.innerHTML = ''; // Полная очистка перед рендером
+
+        if (this.state.editingId) {
+            this.renderManage(root);
         } else {
-            this.renderTabContent(container);
+            this.renderHeader(root);
+            if (this.state.tab === 'tournaments') this.renderTournaments(root);
+            else this.renderPlaceholder(root);
         }
         this.renderNav();
     },
 
-    renderTabContent(container) {
-        // Очищаем заголовок
-        container.innerHTML = `<div class="header-area"><h1 class="neon-text">PADEL RIGA</h1></div>`;
+    renderHeader(root) {
+        const h = document.createElement('div');
+        h.className = 'app-header';
+        h.innerHTML = `<h1 class="neon-title">Padel Riga</h1>`;
+        root.appendChild(h);
+    },
 
-        if (this.state.currentTab === 'tournaments') {
-            let html = `
-                <div class="my-tournaments">
-                    <div class="section-title">Мои турниры (Live)</div>
-                    ${this.state.tournaments.my.map(m => `
-                        <div class="match-item" onclick="App.manageMatch('${m.id}')">
-                            <div style="display:flex; justify-content:space-between; align-items:center;">
-                                <div style="flex:1">
-                                    <div class="player-name">${m.p1}</div>
-                                    ${m.winner === m.p1 ? '<div class="winner-badge">🏆 WINNER</div>' : ''}
-                                </div>
-                                <div style="font-weight:900; color:var(--neon); font-size:18px; padding:0 15px;">
-                                    ${m.s1} : ${m.s2}
-                                </div>
-                                <div style="flex:1; text-align:right">
-                                    <div class="player-name">${m.p2}</div>
-                                    ${m.winner === m.p2 ? '<div class="winner-badge">🏆 WINNER</div>' : ''}
-                                </div>
-                            </div>
-                        </div>
-                    `).join('')}
+    renderTournaments(root) {
+        // Зона "Мои турниры"
+        const myZone = document.createElement('div');
+        myZone.className = 'section-container my-section';
+        myZone.innerHTML = `<div class="label-text">Мои турниры / Live</div>`;
+        
+        this.state.myGames.forEach(g => {
+            const card = document.createElement('div');
+            card.className = 'item-card';
+            card.onclick = () => this.openManage(g.id);
+            card.innerHTML = `
+                <div class="flex-row">
+                    <div class="p-name">${g.p1}</div>
+                    <div class="score-badge">${g.s1}:${g.s2}</div>
+                    <div class="p-name" style="text-align:right">${g.p2}</div>
                 </div>
-                <div class="section-title">Доступные турниры</div>
-                ${this.state.tournaments.available.map(t => `
-                    <div class="match-item available-card">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <div>
-                                <div style="font-weight:bold;">${t.name}</div>
-                                <div style="font-size:12px; color:#666; margin-top:4px;">${t.date} • ${t.players} чел.</div>
-                            </div>
-                            <button style="background:none; border:1px solid var(--neon); color:var(--neon); padding:8px 15px; border-radius:10px; font-size:12px;">Записаться</button>
-                        </div>
-                    </div>
-                `).join('')}
             `;
-            container.innerHTML += html;
-        } else {
-            // Другие экраны теперь реально пустые
-            container.innerHTML += `
-                <div style="text-align:center; padding-top:100px; color:#444;">
-                    <div style="font-size:40px; margin-bottom:10px;">${this.getTabIcon()}</div>
-                    Раздел ${this.state.currentTab.toUpperCase()}<br>скоро будет готов
-                </div>`;
-        }
+            myZone.appendChild(card);
+        });
+        root.appendChild(myZone);
+
+        // Зона "Доступные"
+        const otherZone = document.createElement('div');
+        otherZone.className = 'section-container';
+        otherZone.innerHTML = `<div class="label-text">Доступные турниры</div>`;
+        
+        this.state.others.forEach(t => {
+            const card = document.createElement('div');
+            card.className = 'item-card available-card';
+            card.innerHTML = `
+                <div class="flex-row">
+                    <div>
+                        <div style="font-weight:700">${t.name}</div>
+                        <div style="font-size:11px; color:#555; margin-top:4px;">${t.date} • ${t.players} игроков</div>
+                    </div>
+                    <button style="background:var(--neon); border:none; border-radius:8px; padding:6px 12px; font-weight:700; font-size:11px;">Join</button>
+                </div>
+            `;
+            otherZone.appendChild(card);
+        });
+        root.appendChild(otherZone);
     },
 
-    getTabIcon() {
-        if (this.state.currentTab === 'matches') return '🎾';
-        if (this.state.currentTab === 'stats') return '📊';
-        return '👥';
+    renderManage(root) {
+        const g = this.state.myGames.find(x => x.id === this.state.editingId);
+        root.innerHTML = `
+            <div class="full-manage">
+                <div style="text-align:left"><button onclick="App.setTab('tournaments')" style="background:none; border:none; color:#555; font-size:30px;">✕</button></div>
+                <h2 style="margin-top:40px">Результат игры</h2>
+                <div class="flex-row" style="margin-top:50px">
+                    <div style="flex:1">
+                        <div class="p-name" style="margin-bottom:15px">${g.p1.split(' / ')[0]}</div>
+                        <input type="number" class="big-input" value="${g.s1}" onchange="App.saveScore(${g.id}, 1, this.value)">
+                    </div>
+                    <div style="font-size:30px; font-weight:900; color:#222; align-self:flex-end; padding-bottom:20px">:</div>
+                    <div style="flex:1">
+                        <div class="p-name" style="margin-bottom:15px">${g.p2.split(' / ')[0]}</div>
+                        <input type="number" class="big-input" value="${g.s2}" onchange="App.saveScore(${g.id}, 2, this.value)">
+                    </div>
+                </div>
+                <button onclick="App.setTab('tournaments')" style="background:var(--neon); color:black; border:none; width:100%; padding:20px; border-radius:15px; font-weight:800; margin-top:60px">СОХРАНИТЬ</button>
+            </div>
+        `;
     },
 
-    renderManageScreen(container) {
-        const m = this.state.tournaments.my.find(m => m.id === this.state.editingMatchId);
-        container.innerHTML = `
-            <div class="manage-screen">
-                <div style="text-align:left; margin-bottom:30px;">
-                    <button onclick="App.switchTab('tournaments')" style="background:none; border:none; color:#666; font-size:24px;">✕</button>
-                </div>
-                <h2 style="font-size:20px; margin-bottom:10px;">Завести результат</h2>
-                <p style="color:#666; font-size:14px;">Корт ${m.court}</p>
+    saveScore(id, team, val) {
+        const g = this.state.myGames.find(x => x.id === id);
+        if (team === 1) g.s1 = parseInt(val); else g.s2 = parseInt(val);
+    },
 
-                <div class="score-big-group">
-                    <div>
-                        <div class="player-name" style="margin-bottom:15px;">${m.p1.split(' / ')[0]}</div>
-                        <input type="number" class="score-input-big" value="${m.s1}" onchange="App.state.tournaments.my.find(x=>x.id==='${m.id}').s1=parseInt(this.value)">
-                    </div>
-                    <div style="align-self:center; font-size:24px; font-weight:bold; color:#333;">:</div>
-                    <div>
-                        <div class="player-name" style="margin-bottom:15px;">${m.p2.split(' / ')[0]}</div>
-                        <input type="number" class="score-input-big" value="${m.s2}" onchange="App.state.tournaments.my.find(x=>x.id==='${m.id}').s2=parseInt(this.value)">
-                    </div>
-                </div>
-
-                <button class="btn-save" onclick="App.saveResult()">ПОДТВЕРДИТЬ</button>
-            </div>`;
+    renderPlaceholder(root) {
+        root.innerHTML += `<div style="text-align:center; padding-top:100px; color:#333; font-weight:700;">Раздел ${this.state.tab.toUpperCase()}<br>скоро будет наполнен</div>`;
     },
 
     renderNav() {
         const nav = document.getElementById('bottom-nav');
-        const tabs = [{id:'tournaments', i:'🏆'}, {id:'matches', i:'🎾'}, {id:'stats', i:'📊'}, {id:'profile', i:'👥'}];
-        nav.innerHTML = tabs.map(t => `
-            <div class="nav-item ${this.state.currentTab === t.id ? 'active' : ''}" onclick="App.switchTab('${t.id}')">${t.i}</div>
+        const items = [
+            {id:'tournaments', i:'🏆'}, {id:'matches', i:'🎾'}, 
+            {id:'stats', i:'📊'}, {id:'profile', i:'👥'}
+        ];
+        nav.innerHTML = items.map(item => `
+            <div class="nav-btn ${this.state.tab === item.id ? 'active' : ''}" onclick="App.setTab('${item.id}')">${item.i}</div>
         `).join('');
     }
 };
