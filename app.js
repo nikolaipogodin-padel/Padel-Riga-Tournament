@@ -1,161 +1,105 @@
-// --- STATE MANAGEMENT ---
-let state = JSON.parse(localStorage.getItem('padelState')) || {
-    players: [],
-    waitingList: [],
-    matches: [],
-    settings: {
-        maxPlayers: 16,
-        startTime: new Date(Date.now() + 86400000 * 2).toISOString(), // +2 дня для теста
-        totalDuration: 120, // минут
-        transitionTime: 5,
-        courts: 4
-    }
+// --- STATE ---
+let state = {
+    currentTour: 2,
+    myId: "player_1", // В будущем ID из авторизации
+    tournaments: [
+        { id: 1, name: "Padel Riga Open", status: "OPEN", registered: ["player_1", "player_2"] },
+        { id: 2, name: "Friday Mix", status: "FINISHED", registered: [] }
+    ],
+    matches: [
+        { id: 101, tour: 1, pair1: "Николай / Юрис", pair2: "Анна / Макс", score1: 6, score2: 4, status: "FINISHED" },
+        { id: 102, tour: 2, court: 1, pair1: "Николай / Юрис", pair2: "Олег / Дима", score1: 0, score2: 0, status: "LIVE" },
+        { id: 103, tour: 3, court: 2, pair1: "Николай / Юрис", pair2: "Иван / Петр", status: "FUTURE" }
+    ]
 };
-
-function saveState() {
-    localStorage.setItem('padelState', JSON.stringify(state));
-}
 
 // --- NAVIGATION ---
 function switchScreen(screenId) {
     document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
     document.getElementById(`screen-${screenId}`).classList.remove('hidden');
     
-    // UI Update
-    document.querySelectorAll('nav button').forEach(btn => {
-        btn.classList.remove('text-blue-500', 'font-bold');
-        btn.classList.add('text-slate-400');
+    // Bottom Nav Active State
+    document.querySelectorAll('.nav-item').forEach(btn => {
+        btn.classList.remove('active');
+        if(btn.onclick.toString().includes(screenId)) btn.classList.add('active');
     });
-    event.target.classList.add('text-blue-500', 'font-bold');
 
-    if(screenId === 'leaderboard') renderLeaderboard();
-    if(screenId === 'registration') renderRegistration();
+    if(screenId === 'dashboard') renderDashboard();
     if(screenId === 'live') renderLive();
 }
 
-// --- REGISTRATION LOGIC ---
-function renderRegistration() {
-    const isLocked = (new Date(state.settings.startTime) - new Date()) < 86400000;
-    const btn = document.getElementById('btn-register');
-    const deadlineInfo = document.getElementById('reg-deadline-info');
+// --- DASHBOARD LOGIC ---
+function renderDashboard() {
+    const myContainer = document.getElementById('my-tournaments');
+    const availContainer = document.getElementById('available-tournaments');
 
-    if (isLocked) {
-        btn.disabled = true;
-        btn.innerText = "Регистрация закрыта (24ч до старта)";
-        btn.classList.replace('bg-blue-600', 'bg-slate-700');
-        deadlineInfo.innerText = "Список участников заморожен.";
-    } else {
-        deadlineInfo.innerText = `До конца регистрации: ${Math.floor((new Date(state.settings.startTime) - new Date())/3600000)} ч.`;
-    }
-
-    document.getElementById('count-main').innerText = state.players.length;
-    document.getElementById('count-wait').innerText = state.waitingList.length;
-
-    const mainListUI = document.getElementById('list-main');
-    mainListUI.innerHTML = state.players.map(p => `<li>${p.name}</li>`).join('');
-    
-    const waitListUI = document.getElementById('list-wait');
-    waitListUI.innerHTML = state.waitingList.map(p => `<li>${p.name}</li>`).join('');
-}
-
-function registerPlayer() {
-    const nameInput = document.getElementById('player-name');
-    if (!nameInput.value.trim()) return;
-
-    const newPlayer = { id: Date.now(), name: nameInput.value.trim() };
-
-    if (state.players.length < state.settings.maxPlayers) {
-        state.players.push(newPlayer);
-    } else {
-        state.waitingList.push(newPlayer);
-    }
-
-    nameInput.value = '';
-    saveState();
-    renderRegistration();
-}
-
-// --- TIMING LOGIC ---
-function calculateTiming() {
-    const rounds = 7; // Для 16 человек/4 кортов
-    const totalBuffer = rounds * state.settings.transitionTime;
-    const netTime = state.settings.totalDuration - totalBuffer;
-    let roundMin = netTime / rounds;
-
-    // Золотой стандарт округления вниз [cite: 45]
-    if (roundMin >= 20) roundMin = 20;
-    else if (roundMin >= 15) roundMin = 15;
-    else roundMin = Math.floor(roundMin);
-
-    return { roundMin, totalBuffer };
-}
-
-// --- LIVE TOURNAMENT ---
-function renderLive() {
-    const timing = calculateTiming();
-    document.getElementById('live-timing').innerHTML = `
-        ⚡️ Сетка: 7 туров по <b>${timing.roundMin} мин</b><br>
-        <span class="text-[10px] text-slate-400">Резерв на переходы: ${timing.totalBuffer} мин</span>
-    `;
-
-    // Если матчей нет - генерируем (только если регистрация закрыта)
-    if (state.matches.length === 0 && state.players.length >= 4) {
-        generateSchedule();
-    }
-
-    const grid = document.getElementById('match-grid');
-    grid.innerHTML = state.matches.map((m, idx) => `
-        <div class="match-card p-4 rounded-xl ${m.completed ? 'completed border-slate-800' : ''}">
-            <div class="flex justify-between items-center mb-3">
-                <span class="text-xs text-slate-500">Корт ${m.court}</span>
-                ${m.completed ? `<span class="text-[10px] text-green-500 uppercase font-bold">OK: ${m.inputBy}</span>` : ''}
+    // Мои турниры (где есть мой ID)
+    const myEvents = state.tournaments.filter(t => t.registered.includes(state.myId));
+    myContainer.innerHTML = myEvents.length ? myEvents.map(t => `
+        <div class="tournament-card bg-blue-900/10 border border-blue-500/20 p-4 rounded-xl">
+            <div class="flex justify-between items-center">
+                <span class="font-bold">${t.name}</span>
+                <span class="text-blue-500 text-xs font-bold">LIVE МОМЕНТ</span>
             </div>
-            <div class="grid grid-cols-3 items-center gap-2 text-center">
-                <div class="font-bold text-sm">${m.pair1}</div>
-                <div class="flex gap-1 justify-center">
-                    <input type="number" id="s1-${idx}" value="${m.score1}" ${m.completed ? 'disabled' : ''} class="w-8 h-8 bg-slate-800 text-center rounded">
-                    <span class="text-slate-600">:</span>
-                    <input type="number" id="s2-${idx}" value="${m.score2}" ${m.completed ? 'disabled' : ''} class="w-8 h-8 bg-slate-800 text-center rounded">
-                </div>
-                <div class="font-bold text-sm">${m.pair2}</div>
-            </div>
-            ${!m.completed ? `
-                <button onclick="saveScore(${idx})" class="w-full mt-3 bg-slate-800 hover:bg-slate-700 py-1 text-xs rounded transition">Сохранить счет</button>
-            ` : ''}
         </div>
+    `).join('') : "Нет активных участий";
+}
+
+// --- LIVE GRID LOGIC ---
+function renderLive() {
+    const grid = document.getElementById('match-grid');
+    const tabs = document.getElementById('tour-tabs');
+
+    // Генерируем табы туров (1-7)
+    tabs.innerHTML = [1,2,3,4,5,6,7].map(t => `
+        <button class="tour-tab ${state.currentTour === t ? 'active' : ''}" onclick="state.currentTour = ${t}; renderLive();">
+            ТУР ${t}
+        </button>
     `).join('');
+
+    // Фильтруем матчи для выбранного тура
+    const tourMatches = state.matches.filter(m => m.tour === state.currentTour);
+
+    grid.innerHTML = tourMatches.map(m => {
+        if (m.status === "FINISHED") {
+            return `
+                <div class="match-card finished flex justify-between items-center">
+                    <div class="text-sm font-bold ${m.score1 > m.score2 ? 'text-green-500' : ''}">${m.pair1}</div>
+                    <div class="bg-slate-800 px-3 py-1 rounded text-lg font-black">${m.score1}:${m.score2}</div>
+                    <div class="text-sm font-bold ${m.score2 > m.score1 ? 'text-green-500' : ''}">${m.pair2}</div>
+                </div>
+            `;
+        }
+        
+        if (m.status === "LIVE") {
+            return `
+                <div class="match-card live">
+                    <div class="flex justify-between text-[10px] text-blue-500 font-bold mb-4 uppercase tracking-tighter">
+                        <span>Корт ${m.court}</span>
+                        <span>Ввести счет</span>
+                    </div>
+                    <div class="flex justify-between items-center gap-4">
+                        <div class="flex-1 text-center font-bold text-sm leading-tight">${m.pair1}</div>
+                        <div class="flex items-center gap-2">
+                            <input type="number" class="score-input" value="${m.score1}">
+                            <input type="number" class="score-input" value="${m.score2}">
+                        </div>
+                        <div class="flex-1 text-center font-bold text-sm leading-tight">${m.pair2}</div>
+                    </div>
+                    <button class="w-full bg-blue-600 mt-4 py-2 rounded-xl text-xs font-black uppercase">Сохранить результат</button>
+                </div>
+            `;
+        }
+
+        return `
+            <div class="match-card future flex justify-between items-center border-dashed">
+                <div class="text-xs text-slate-500">${m.pair1}</div>
+                <div class="text-[10px] bg-slate-800/50 px-2 py-1 rounded text-slate-400 font-bold">VS</div>
+                <div class="text-xs text-slate-500">${m.pair2}</div>
+            </div>
+        `;
+    }).join('');
 }
 
-function generateSchedule() {
-    // Временная заглушка генератора (фиксированные пары)
-    // В версии 2.1 здесь будет алгоритм Round Robin
-    for(let i=1; i<=4; i++) {
-        state.matches.push({
-            court: i,
-            pair1: `Пара ${i}`,
-            pair2: `Пара ${i+4}`,
-            score1: 0,
-            score2: 0,
-            completed: false,
-            inputBy: ''
-        });
-    }
-    saveState();
-}
-
-function saveScore(idx) {
-    const s1 = document.getElementById(`s1-${idx}`).value;
-    const s2 = document.getElementById(`s2-${idx}`).value;
-    
-    // Псевдо-авторизация: берем первого из списка (в будущем - ID юзера) [cite: 23]
-    state.matches[idx].score1 = parseInt(s1);
-    state.matches[idx].score2 = parseInt(s2);
-    state.matches[idx].completed = true;
-    state.matches[idx].inputBy = "Игрок " + state.players[0].name.split(' ')[0]; 
-
-    saveState();
-    renderLive();
-}
-
-// Initial render
-renderRegistration();
+// Start
+renderDashboard();
