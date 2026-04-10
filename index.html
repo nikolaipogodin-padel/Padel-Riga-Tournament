@@ -2,47 +2,79 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Padel Club Riga</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Padel Riga Tracker v2.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="dark-theme">
-    <div id="app">
-        <header>
-            <h1 class="neon-text">PADEL RIGA</h1>
-        </header>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
 
-        <main id="main-content">
-            <div id="screen-tournaments" class="screen active">
-                <div id="tournament-list"></div>
-            </div>
+    <nav class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50">
+        <div class="max-w-md mx-auto flex justify-around p-4">
+            <button onclick="switchScreen('dashboard')" class="text-blue-500 font-bold">Турниры</button>
+            <button onclick="switchScreen('registration')" class="text-slate-400">Регистрация</button>
+            <button onclick="switchScreen('live')" class="text-slate-400">LIVE</button>
+            <button onclick="switchScreen('leaderboard')" class="text-slate-400">Рейтинг</button>
+        </div>
+    </nav>
+
+    <main class="max-w-md mx-auto p-4 pb-24">
+        <section id="screen-dashboard" class="screen">
+            <h1 class="text-2xl font-bold mb-6">Активные турниры</h1>
+            <div id="tournament-list" class="space-y-4">
+                </div>
+        </section>
+
+        <section id="screen-registration" class="screen hidden">
+            <h1 class="text-2xl font-bold mb-2">Регистрация</h1>
+            <p id="reg-deadline-info" class="text-sm text-slate-400 mb-6"></p>
             
-            <div id="screen-matches" class="screen">
-                <h2 class="screen-title">LIVE МАТЧИ</h2>
-                <div id="all-matches-list"></div>
+            <div class="bg-slate-900 p-4 rounded-xl mb-6 border border-slate-800">
+                <input type="text" id="player-name" placeholder="Ваше имя и фамилия" class="w-full bg-slate-800 border border-slate-700 p-3 rounded-lg mb-3">
+                <button onclick="registerPlayer()" id="btn-register" class="w-full bg-blue-600 hover:bg-blue-500 py-3 rounded-lg font-bold transition">Записаться</button>
             </div>
 
-            <div id="screen-detail" class="screen">
-                <button class="btn-back" onclick="App.switchTab('tournaments')">← Назад</button>
-                <div id="match-container"></div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <h3 class="text-green-500 font-bold mb-2">Основа (<span id="count-main">0</span>/16)</h3>
+                    <ul id="list-main" class="space-y-2 text-sm"></ul>
+                </div>
+                <div>
+                    <h3 class="text-yellow-500 font-bold mb-2">Очередь (<span id="count-wait">0</span>)</h3>
+                    <ul id="list-wait" class="space-y-2 text-sm text-slate-400"></ul>
+                </div>
             </div>
+        </section>
 
-            <div id="screen-stats" class="screen">
-                <h2 class="screen-title">РЕЙТИНГ ИГРОКОВ</h2>
-                <div id="leaderboard"></div>
+        <section id="screen-live" class="screen hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-2xl font-bold">Tournament Live</h1>
+                <span class="bg-red-600 text-[10px] px-2 py-1 rounded animate-pulse">LIVE</span>
             </div>
+            <div id="live-timing" class="bg-blue-900/30 border border-blue-500/50 p-3 rounded-lg mb-6 text-center text-sm">
+                </div>
+            <div id="match-grid" class="space-y-4">
+                </div>
+        </section>
 
-            <div id="screen-profile" class="screen">
-                <h2 class="screen-title">МОЙ ПРОФИЛЬ</h2>
-                <div id="user-profile"></div>
+        <section id="screen-leaderboard" class="screen hidden">
+            <h1 class="text-2xl font-bold mb-6">Таблица лидеров</h1>
+            <div class="bg-slate-900 rounded-xl overflow-hidden border border-slate-800">
+                <table class="w-full text-left">
+                    <thead class="bg-slate-800 text-xs uppercase text-slate-400">
+                        <tr>
+                            <th class="p-3">Пара</th>
+                            <th class="p-3 text-center">И</th>
+                            <th class="p-3 text-center">+/-</th>
+                            <th class="p-3 text-right">Очки</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-body"></tbody>
+                </table>
             </div>
-        </main>
+        </section>
+    </main>
 
-        <nav class="bottom-nav" id="bottom-nav"></nav>
-    </div>
-
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
