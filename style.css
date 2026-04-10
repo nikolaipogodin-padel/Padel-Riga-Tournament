@@ -1,70 +1,43 @@
+/* Custom Dark Theme Styles */
 :root {
-    --bg: #0A0C0F;
-    --card: #161A1F;
-    --card-available: #111418;
-    --neon: #39FF14;
-    --border: rgba(255, 255, 255, 0.08);
+    --primary-blue: #3b82f6;
+    --win-green: #22c55e;
+    --lose-red: #ef4444;
 }
 
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-body { 
-    background: var(--bg); color: white; font-family: -apple-system, sans-serif; 
-    margin: 0; padding-bottom: 100px; line-height: 1.4;
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-/* Заголовок - теперь фиксированный и без дублей */
-.app-header {
-    padding: 20px; background: var(--bg);
-    position: sticky; top: 0; z-index: 100;
-}
-.neon-title { 
-    color: var(--neon); font-size: 22px; font-weight: 900; 
-    text-transform: uppercase; letter-spacing: 1px; margin: 0;
+.screen {
+    animation: fadeIn 0.3s ease-in-out;
 }
 
-/* Разделение зон */
-.section-container { margin-bottom: 30px; }
-.my-section { background: linear-gradient(180deg, rgba(57, 255, 20, 0.05) 0%, rgba(10, 12, 15, 0) 100%); padding-top: 10px; }
-
-.label-text { 
-    font-size: 12px; color: #555; font-weight: 800; 
-    text-transform: uppercase; margin: 15px 20px 8px; letter-spacing: 1.5px;
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-/* Карточки */
-.item-card {
-    background: var(--card); border-radius: 20px; padding: 18px; 
-    margin: 10px 15px; border: 1px solid var(--border);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-}
-.item-card:active { transform: scale(0.98); opacity: 0.9; }
-
-.available-card { background: var(--card-available); border: 1px dashed #333; }
-
-/* Стили матча */
-.flex-row { display: flex; justify-content: space-between; align-items: center; }
-.p-name { font-weight: 700; font-size: 15px; flex: 1; }
-.score-badge { 
-    background: #000; color: var(--neon); padding: 6px 12px; 
-    border-radius: 10px; font-weight: 900; margin: 0 15px; border: 1px solid #222;
+/* Card Styling */
+.match-card {
+    background: linear-gradient(145deg, #0f172a, #1e293b);
+    border: 1px solid #334155;
+    transition: all 0.2s;
 }
 
-/* Навигация */
-.nav-bar {
-    position: fixed; bottom: 0; left: 0; right: 0; height: 75px;
-    background: rgba(16, 20, 24, 0.98); backdrop-filter: blur(15px);
-    border-top: 1px solid var(--border); display: flex;
-    justify-content: space-around; align-items: center; z-index: 1000;
+.match-card.completed {
+    border-color: #1e293b;
+    opacity: 0.8;
 }
-.nav-btn { font-size: 22px; opacity: 0.25; transition: 0.2s; padding: 10px; }
-.nav-btn.active { opacity: 1; color: var(--neon); transform: translateY(-3px); }
 
-/* Экран управления */
-.full-manage { padding: 20px; text-align: center; animation: slideIn 0.3s ease; }
-@keyframes slideIn { from { transform: translateY(100%); } to { transform: translateY(0); } }
+/* Input Chrome Removal */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
 
-.big-input {
-    width: 75px; height: 90px; background: #000; border: 2px solid #333;
-    color: var(--neon); text-align: center; border-radius: 20px; font-size: 36px; font-weight: 800;
+.active-nav {
+    color: var(--primary-blue) !important;
+    border-bottom: 2px solid var(--primary-blue);
 }
