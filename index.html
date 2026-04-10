@@ -3,107 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Padel Riga 2.0</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Padel Riga</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
-<body class="bg-[#05070a] text-slate-100 min-h-screen pb-24">
+<body>
+    <div id="app">
+        <header class="app-header">
+            <h1 class="neon-title">Padel Riga</h1>
+        </header>
 
-    <main class="max-w-md mx-auto p-4">
-        <section id="screen-dashboard" class="screen">
-            <h1 class="text-3xl font-black mb-8 tracking-tight">ТУРНИРЫ [cite: 16]</h1>
-            <div class="mb-8">
-                <h3 class="text-[10px] font-bold text-blue-500 uppercase tracking-widest mb-4">Мои участия</h3>
-                <div id="my-tournaments" class="space-y-4 text-slate-500 italic text-xs">Нет активных регистраций</div>
-            </div>
-            <div>
-                <h3 class="text-[10px] font-bold text-green-500 uppercase tracking-widest mb-4">Доступные ивенты [cite: 16, 27]</h3>
-                <div id="available-tournaments" class="space-y-4">
-                    <div class="tournament-card bg-[#0f1218] p-5 rounded-2xl border border-slate-800/50" onclick="switchScreen('registration')">
-                        <div class="flex justify-between items-start mb-4">
-                            <span class="bg-green-500/10 text-green-500 text-[10px] font-bold px-2 py-1 rounded">OPEN [cite: 16]</span>
-                            <span class="text-slate-500 text-xs">12.04 • 19:00</span>
-                        </div>
-                        <h2 class="text-xl font-bold mb-1">Padel Riga Open</h2>
-                        <p class="text-slate-400 text-[10px] mb-4">Рига, ул. Сканстес (4 корта)</p>
-                        <div class="flex justify-between items-center text-sm font-medium">
-                            <span class="text-xs">Участники: <span id="reg-count-display">0</span>/16 [cite: 17, 41]</span>
-                            <span class="text-blue-500 text-xs">Записаться →</span>
-                        </div>
+        <main id="main-content">
+            <section id="screen-tournaments" class="screen active">
+                <div class="section-label">Мои активные матчи</div>
+                <div id="my-matches-list"></div>
+                <div class="section-label">Предстоящие турниры</div>
+                <div id="future-list"></div>
+            </section>
+
+            <section id="screen-matches" class="screen">
+                <div class="section-label">Прямой эфир (Все корты)</div>
+                <div id="all-matches-list"></div>
+            </section>
+
+            <section id="screen-stats" class="screen">
+                <div class="section-label">Рейтинг игроков</div>
+                <div id="leaderboard-list"></div>
+            </section>
+
+            <section id="screen-profile" class="screen">
+                <div class="profile-card">
+                    <div class="avatar">👤</div>
+                    <h2>Николай Рига</h2>
+                    <div class="badge">PRO PLAYER</div>
+                    <div class="stats-row">
+                        <div><span>Rating</span><br>1450</div>
+                        <div><span>Wins</span><br>24</div>
+                        <div><span>Rank</span><br>#4</div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
+        </main>
 
-        <section id="screen-registration" class="screen hidden">
-            <h1 class="text-3xl font-black mb-6 tracking-tight">ЗАПИСЬ [cite: 17]</h1>
-            <div class="bg-[#0f1218] p-6 rounded-2xl border border-slate-800 mb-8">
-                <input type="text" id="player-name-input" placeholder="Ваше имя и фамилия" class="w-full bg-[#161b22] border border-slate-700 p-4 rounded-xl mb-4 text-white focus:outline-none focus:border-blue-500">
-                <button onclick="handleRegister()" class="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-xl font-bold transition uppercase tracking-tighter">Подтвердить участие</button>
-            </div>
-            <div class="grid grid-cols-2 gap-6">
-                <div>
-                    <h3 class="text-green-500 text-[10px] font-black uppercase mb-4">Основа (<span id="count-main">0</span>/16)</h3>
-                    <ul id="list-main" class="space-y-2 text-xs font-medium"></ul>
+        <div id="modal-score" class="modal">
+            <div class="modal-content">
+                <button class="close-modal" onclick="App.closeScore()">✕</button>
+                <h3 id="edit-match-names">Счет матча</h3>
+                <div class="score-input-zone">
+                    <input type="number" id="s1" class="big-input">
+                    <span class="divider">:</span>
+                    <input type="number" id="s2" class="big-input">
                 </div>
-                <div>
-                    <h3 class="text-yellow-500 text-[10px] font-black uppercase mb-4">Очередь (<span id="count-wait">0</span>) [cite: 36]</h3>
-                    <ul id="list-wait" class="space-y-2 text-xs text-slate-500"></ul>
-                </div>
+                <button class="save-btn" onclick="App.saveScore()">ПОДТВЕРДИТЬ</button>
             </div>
-        </section>
-
-        <section id="screen-live" class="screen hidden">
-            <div class="flex justify-between items-end mb-6">
-                <h1 class="text-3xl font-black tracking-tight">LIVE [cite: 18, 29]</h1>
-                <div class="flex items-center gap-2 mb-1">
-                    <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-                    <span id="current-tour-label" class="text-[10px] font-bold text-red-500 uppercase">Тур 1 [cite: 18]</span>
-                </div>
-            </div>
-            <div id="tour-tabs" class="flex gap-2 overflow-x-auto mb-6 no-scrollbar"></div>
-            <div id="match-grid" class="space-y-4"></div>
-        </section>
-
-        <section id="screen-leaderboard" class="screen hidden">
-            <h1 class="text-3xl font-black mb-8 tracking-tight">РЕЙТИНГ [cite: 19]</h1>
-            <div id="leaderboard-content" class="bg-[#0f1218] rounded-2xl border border-slate-800 overflow-hidden">
-                <table class="w-full text-left text-xs">
-                    <thead class="bg-slate-800/50 text-slate-400 uppercase">
-                        <tr>
-                            <th class="p-4">Игрок</th>
-                            <th class="p-4 text-center">И</th>
-                            <th class="p-4 text-right">Очки</th>
-                        </tr>
-                    </thead>
-                    <tbody id="leaderboard-body"></tbody>
-                </table>
-            </div>
-        </section>
-    </main>
-
-    <nav class="fixed bottom-0 left-0 right-0 bg-[#0f1218]/90 backdrop-blur-xl border-t border-white/5 px-4 py-3 z-50">
-        <div class="max-w-md mx-auto flex justify-between items-center">
-            <button onclick="switchScreen('dashboard')" class="nav-item active text-slate-400 flex flex-col items-center flex-1">
-                <span class="material-icons text-xl">emoji_events</span>
-                <span class="text-[9px] font-bold uppercase mt-1">Турниры</span>
-            </button>
-            <button onclick="switchScreen('registration')" class="nav-item text-slate-400 flex flex-col items-center flex-1">
-                <span class="material-icons text-xl">person_add</span>
-                <span class="text-[9px] font-bold uppercase mt-1">Запись</span>
-            </button>
-            <button onclick="switchScreen('live')" class="nav-item text-slate-400 flex flex-col items-center flex-1">
-                <span class="material-icons text-xl">play_circle</span>
-                <span class="text-[9px] font-bold uppercase mt-1">Live</span>
-            </button>
-            <button onclick="switchScreen('leaderboard')" class="nav-item text-slate-400 flex flex-col items-center flex-1">
-                <span class="material-icons text-xl">leaderboard</span>
-                <span class="text-[9px] font-bold uppercase mt-1">Рейтинг</span>
-            </button>
         </div>
-    </nav>
 
+        <nav class="nav-bar">
+            <div class="nav-btn active" onclick="App.switchTab('tournaments', this)">🏆</div>
+            <div class="nav-btn" onclick="App.switchTab('matches', this)">🎾</div>
+            <div class="nav-btn" onclick="App.switchTab('stats', this)">📊</div>
+            <div class="nav-btn" onclick="App.switchTab('profile', this)">👥</div>
+        </nav>
+    </div>
     <script src="app.js"></script>
 </body>
 </html>
