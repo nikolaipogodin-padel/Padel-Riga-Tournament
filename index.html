@@ -1,147 +1,97 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Padel Riga Tracker</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
-        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-    </style>
-</head>
-<body class="bg-slate-50 text-slate-900">
-
-    <div id="app" class="max-w-md mx-auto min-h-screen flex flex-col">
-        
-        <main id="registration-screen" class="p-6 flex-grow">
-            <header class="mb-8">
-                <h1 class="text-3xl font-800 tracking-tight text-slate-900">Padel Riga</h1>
-                <p class="text-slate-500 font-medium">Tournament Registration</p>
-            </header>
-
-            <div class="bg-indigo-600 rounded-[2rem] p-6 mb-8 text-white shadow-2xl shadow-indigo-200 relative overflow-hidden">
-                <div class="relative z-10">
-                    <div class="flex justify-between items-start mb-4">
-                        <span class="bg-indigo-500 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Fixed Pairs</span>
-                        <span class="text-indigo-200 text-sm">v2.6</span>
-                    </div>
-                    <h2 class="text-2xl font-bold mb-1">Riga Open Cup</h2>
-                    <p class="text-indigo-100 text-sm opacity-80">24 мая • 19:00 • 4 Корта</p>
-                    
-                    <div class="grid grid-cols-2 gap-3 mt-6">
-                        <div class="bg-white/10 backdrop-blur-md p-3 rounded-2xl">
-                            <p class="text-[10px] uppercase font-bold text-indigo-200 mb-1">Свободно</p>
-                            <p class="text-xl font-bold" id="slots-count">16</p>
-                        </div>
-                        <div class="bg-white/10 backdrop-blur-md p-3 rounded-2xl">
-                            <p class="text-[10px] uppercase font-bold text-indigo-200 mb-1">Очередь</p>
-                            <p class="text-xl font-bold" id="waitlist-count">0</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-indigo-500 rounded-full blur-3xl opacity-50"></div>
-            </div>
-
-            <form id="registration-form" class="space-y-5">
-                <div>
-                    <label class="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2 ml-1">Имя и Фамилия</label>
-                    <input type="text" id="player-name" required placeholder="Ivan Ivanov" 
-                        class="w-full bg-white border-2 border-slate-100 p-4 rounded-2xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all text-lg shadow-sm">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2 ml-1">Уровень (NTRP)</label>
-                    <select id="player-level" class="w-full bg-white border-2 border-slate-100 p-4 rounded-2xl focus:border-indigo-500 outline-none transition-all text-lg shadow-sm appearance-none cursor-pointer">
-                        <option value="2.0">2.0 — Новичок</option>
-                        <option value="3.0" selected>3.0 — Средний</option>
-                        <option value="4.0">4.0 — Продвинутый</option>
-                        <option value="5.0">5.0 — Профи</option>
-                    </select>
-                </div>
-
-                <div class="pt-4">
-                    <button type="submit" 
-                        class="w-full bg-slate-900 text-white py-5 rounded-[2rem] font-bold text-xl shadow-xl shadow-slate-200 active:scale-[0.97] transition-all">
-                        Записаться на турнир
-                    </button>
-                    <p class="text-center text-slate-400 text-xs mt-4 px-6">
-                        Отмена участия возможна за 24 часа до старта 
-                    </p>
-                </div>
-            </form>
-
-            <div id="success-state" class="hidden text-center py-12 animate-in fade-in zoom-in duration-300">
-                <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-                </div>
-                <h3 class="text-2xl font-bold mb-2" id="success-title">Вы в игре!</h3>
-                <p class="text-slate-500 mb-8" id="success-msg">Дождитесь подтверждения админом [cite: 17]</p>
-                <button onclick="location.reload()" class="text-indigo-600 font-bold">Вернуться назад</button>
-            </div>
-        </main>
-    </div>
-
-    <script>
-        // Конфигурация согласно ТЗ [cite: 26, 28]
-        const CONFIG = {
-            COURTS: 4,
-            PLAYERS_PER_COURT: 4,
-            get MAX_PLAYERS() { return this.COURTS * this.PLAYERS_PER_COURT }
-        };
-
-        const state = {
-            players: JSON.parse(localStorage.getItem('padel_players') || '[]')
-        };
-
-        const form = document.getElementById('registration-form');
-        const successState = document.getElementById('success-state');
-        const slotsCount = document.getElementById('slots-count');
-        const waitlistCount = document.getElementById('waitlist-count');
-
-        // Инициализация счетчиков
-        function updateCounters() {
-            const confirmed = state.players.filter(p => p.status !== 'waiting').length;
-            const waiting = state.players.filter(p => p.status === 'waiting').length;
-            
-            slotsCount.innerText = Math.max(0, CONFIG.MAX_PLAYERS - confirmed);
-            waitlistCount.innerText = waiting;
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Padel Riga Tracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            inter: ['Inter', 'system-ui', 'sans-serif']
+          }
         }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="app-body text-white font-inter">
+  <div id="app-shell" class="app-shell">
+    <header id="main-header" class="main-header">
+      <div>
+        <p class="eyebrow">Padel Riga</p>
+        <h1 class="brand-title">PADEL RIGA</h1>
+      </div>
+      <button class="ghost-pill" type="button" onclick="router.navigate('registration')">Регистрация</button>
+    </header>
 
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            const name = document.getElementById('player-name').value;
-            const level = document.getElementById('player-level').value;
-            
-            // Логика очереди [cite: 18, 29]
-            const isWaitlist = state.players.length >= CONFIG.MAX_PLAYERS;
-            
-            const newPlayer = {
-                id: Date.now(),
-                name,
-                level,
-                status: isWaitlist ? 'waiting' : 'pending',
-                regTime: new Date().toISOString()
-            };
+    <main id="screen-content" class="screen-content"></main>
 
-            state.players.push(newPlayer);
-            localStorage.setItem('padel_players', JSON.stringify(state.players));
+    <nav class="bottom-nav">
+      <button class="nav-item active" data-screen="dashboard" onclick="router.navigate('dashboard')">
+        <span class="nav-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M3 10.5 12 3l9 7.5"></path>
+            <path d="M5 9.5V20h14V9.5"></path>
+          </svg>
+        </span>
+        <span>Dashboard</span>
+      </button>
 
-            // UI Switch
-            form.classList.add('hidden');
-            successState.classList.remove('hidden');
-            
-            if(isWaitlist) {
-                document.getElementById('success-title').innerText = "Вы в очереди";
-                document.getElementById('success-msg').innerText = "Мест пока нет, но вы узнаете первым, если кто-то снимется [cite: 19]";
-            }
+      <button class="nav-item" data-screen="live" onclick="router.navigate('live')">
+        <span class="nav-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z"></path>
+            <path d="M4.9 4.9A10 10 0 0 0 2 12"></path>
+            <path d="M19.1 4.9A10 10 0 0 1 22 12"></path>
+            <path d="M4.9 19.1A10 10 0 0 1 2 12"></path>
+            <path d="M19.1 19.1A10 10 0 0 0 22 12"></path>
+          </svg>
+        </span>
+        <span>LIVE</span>
+      </button>
 
-            updateCounters();
-        });
+      <button class="nav-item" data-screen="grid" onclick="router.navigate('grid')">
+        <span class="nav-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+            <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+            <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+            <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+          </svg>
+        </span>
+        <span>Grid</span>
+      </button>
 
-        updateCounters();
-    </script>
+      <button class="nav-item" data-screen="stats" onclick="router.navigate('stats')">
+        <span class="nav-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M5 19V9"></path>
+            <path d="M12 19V5"></path>
+            <path d="M19 19v-7"></path>
+          </svg>
+        </span>
+        <span>Stats</span>
+      </button>
+
+      <button class="nav-item" data-screen="registration" onclick="router.navigate('registration')">
+        <span class="nav-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M12 5v14"></path>
+            <path d="M5 12h14"></path>
+          </svg>
+        </span>
+        <span>Join</span>
+      </button>
+    </nav>
+  </div>
+
+  <script src="app.js"></script>
 </body>
 </html>
