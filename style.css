@@ -1,45 +1,78 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+:root {
+    --bg: #07080A;
+    --card: #121418;
+    --card-hover: #1A1D23;
+    --neon: #39FF14;
+    --text-main: #FFFFFF;
+    --text-dim: #626B77;
+    --border: rgba(255, 255, 255, 0.05);
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
 body { 
-    font-family: 'Inter', sans-serif; 
-    -webkit-tap-highlight-color: transparent; 
-    overscroll-behavior: none;
+    background: var(--bg); color: var(--text-main); 
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+    margin: 0; padding-bottom: 100px;
 }
 
-.screen { animation: slideUp 0.3s ease-out; }
-@keyframes slideUp {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+/* Шапка */
+.app-header {
+    padding: 25px 20px 15px; background: rgba(7, 8, 10, 0.8);
+    backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100;
+}
+.neon-title { 
+    color: var(--neon); font-size: 20px; font-weight: 900; 
+    text-transform: uppercase; letter-spacing: 2px; margin: 0;
 }
 
-.nav-item.active { 
-    color: #3b82f6 !important; 
+/* Секции */
+.section { margin-bottom: 32px; }
+.section-title { 
+    font-size: 11px; color: var(--text-dim); font-weight: 800; 
+    text-transform: uppercase; margin: 0 20px 12px; letter-spacing: 1.2px;
 }
 
-.tournament-card {
-    background: linear-gradient(160deg, #11151c 0%, #07090d 100%);
+/* Карточки матчей */
+.card {
+    background: var(--card); border-radius: 24px; padding: 20px; 
+    margin: 0 16px 12px; border: 1px solid var(--border);
+    transition: transform 0.2s;
+}
+.card:active { transform: scale(0.97); }
+
+.flex-center { display: flex; justify-content: space-between; align-items: center; }
+
+.player-box { flex: 1; font-weight: 700; font-size: 15px; line-height: 1.2; }
+.score-main { 
+    font-size: 22px; font-weight: 900; color: var(--neon); 
+    padding: 0 20px; min-width: 80px; text-align: center;
 }
 
-.score-input {
-    background: #161b22;
-    border: 1px solid #334155;
-    border-radius: 8px;
-    width: 36px;
-    height: 36px;
-    text-align: center;
-    font-weight: 900;
-    color: #3b82f6;
-}
+.court-tag { font-size: 10px; color: var(--text-dim); margin-top: 8px; font-weight: 600; }
 
-.tour-tab {
-    padding: 8px 16px;
-    background: #11151c;
-    border-radius: 12px;
-    font-size: 10px;
-    font-weight: 800;
-    white-space: nowrap;
-    color: #475569;
+/* Навигация (Эталонный вид) */
+.nav-bar {
+    position: fixed; bottom: 15px; left: 15px; right: 15px; height: 68px;
+    background: rgba(26, 29, 35, 0.9); backdrop-filter: blur(20px);
+    border-radius: 25px; border: 1px solid var(--border);
+    display: flex; justify-content: space-around; align-items: center; z-index: 1000;
 }
-.tour-tab.active { background: #3b82f6; color: white; }
+.nav-btn { font-size: 22px; opacity: 0.3; transition: 0.3s; padding: 10px; }
+.nav-btn.active { opacity: 1; color: var(--neon); transform: translateY(-2px); }
 
-.no-scrollbar::-webkit-scrollbar { display: none; }
+/* Экран управления */
+.manage-view { padding: 30px 20px; text-align: center; }
+.close-btn { position: absolute; top: 25px; left: 20px; font-size: 28px; color: var(--text-dim); background: none; border: none; }
+
+.big-score-input {
+    width: 85px; height: 100px; background: #000; border: 2px solid #222;
+    color: var(--neon); text-align: center; border-radius: 24px; 
+    font-size: 42px; font-weight: 900; margin: 0 10px;
+}
+.big-score-input:focus { border-color: var(--neon); outline: none; }
+
+.save-btn {
+    background: var(--neon); color: #000; border: none; width: 100%; 
+    padding: 22px; border-radius: 20px; font-weight: 900; font-size: 16px; margin-top: 40px;
+}
