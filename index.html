@@ -3,67 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Padel Riga</title>
+    <title>Padel Riga Pro</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="app">
-        <header class="app-header">
-            <h1 class="neon-title">Padel Riga</h1>
-        </header>
+    <header class="app-header">
+        <h1 class="neon-title">Padel Riga</h1>
+    </header>
 
-        <main id="main-content">
-            <section id="screen-tournaments" class="screen active">
-                <div class="section-label">Мои активные матчи</div>
-                <div id="my-matches-list"></div>
-                <div class="section-label">Предстоящие турниры</div>
-                <div id="future-list"></div>
-            </section>
+    <main id="main-content">
+        <section id="screen-tournaments" class="screen active">
+            <div class="label">Мои активные матчи</div>
+            <div id="my-list"></div>
+            <div class="label">Будущие турниры</div>
+            <div id="future-list"></div>
+        </section>
 
-            <section id="screen-matches" class="screen">
-                <div class="section-label">Прямой эфир (Все корты)</div>
-                <div id="all-matches-list"></div>
-            </section>
+        <section id="screen-matches" class="screen">
+            <div class="label">Прямой эфир / Все корты</div>
+            <div id="live-list"></div>
+        </section>
 
-            <section id="screen-stats" class="screen">
-                <div class="section-label">Рейтинг игроков</div>
-                <div id="leaderboard-list"></div>
-            </section>
+        <section id="screen-stats" class="screen">
+            <div class="label">Топ игроков сезона</div>
+            <div id="stats-list"></div>
+        </section>
 
-            <section id="screen-profile" class="screen">
-                <div class="profile-card">
-                    <div class="avatar">👤</div>
-                    <h2>Николай Рига</h2>
-                    <div class="badge">PRO PLAYER</div>
-                    <div class="stats-row">
-                        <div><span>Rating</span><br>1450</div>
-                        <div><span>Wins</span><br>24</div>
-                        <div><span>Rank</span><br>#4</div>
-                    </div>
+        <section id="screen-profile" class="screen">
+            <div class="profile-card">
+                <div class="avatar">👤</div>
+                <h2>Николай Рига</h2>
+                <div class="rank-badge">GOLD CLASS</div>
+                <div class="stats-grid">
+                    <div><small>Rating</small><br><b>1450</b></div>
+                    <div><small>Matches</small><br><b>32</b></div>
+                    <div><small>Wins</small><br><b>24</b></div>
                 </div>
-            </section>
-        </main>
-
-        <div id="modal-score" class="modal">
-            <div class="modal-content">
-                <button class="close-modal" onclick="App.closeScore()">✕</button>
-                <h3 id="edit-match-names">Счет матча</h3>
-                <div class="score-input-zone">
-                    <input type="number" id="s1" class="big-input">
-                    <span class="divider">:</span>
-                    <input type="number" id="s2" class="big-input">
-                </div>
-                <button class="save-btn" onclick="App.saveScore()">ПОДТВЕРДИТЬ</button>
             </div>
-        </div>
+        </section>
+    </main>
 
-        <nav class="nav-bar">
-            <div class="nav-btn active" onclick="App.switchTab('tournaments', this)">🏆</div>
-            <div class="nav-btn" onclick="App.switchTab('matches', this)">🎾</div>
-            <div class="nav-btn" onclick="App.switchTab('stats', this)">📊</div>
-            <div class="nav-btn" onclick="App.switchTab('profile', this)">👥</div>
-        </nav>
+    <div id="modal-score" class="modal">
+        <div class="modal-body">
+            <button class="modal-close" onclick="App.closeScore()">✕</button>
+            <h3 id="m-names">Счет матча</h3>
+            <div class="score-inputs">
+                <input type="number" id="s1" class="score-input">
+                <span class="sep">:</span>
+                <input type="number" id="s2" class="score-input">
+            </div>
+            <button class="save-btn" onclick="App.saveScore()">СОХРАНИТЬ</button>
+        </div>
     </div>
+
+    <nav class="nav-bar">
+        <div class="nav-item active" onclick="App.switchTab('tournaments', this)">🏆</div>
+        <div class="nav-item" onclick="App.switchTab('matches', this)">🎾</div>
+        <div class="nav-item" onclick="App.switchTab('stats', this)">📊</div>
+        <div class="nav-item" onclick="App.switchTab('profile', this)">👥</div>
+    </nav>
+
     <script src="app.js"></script>
 </body>
 </html>
