@@ -12,16 +12,30 @@
             <h1 class="neon-text">PADEL RIGA</h1>
         </header>
 
-        <main id="screen-list" class="screen active">
-            <div id="tournament-list"></div>
-        </main>
-
-        <main id="screen-detail" class="screen">
-            <div class="header-controls">
-                <button class="btn-back" onclick="App.switchScreen('list')">← ТУРНИРЫ</button>
-                <div id="detail-title" class="t-name-detail"></div>
+        <main id="main-content">
+            <div id="screen-tournaments" class="screen active">
+                <div id="tournament-list"></div>
             </div>
-            <div id="match-container"></div>
+            
+            <div id="screen-matches" class="screen">
+                <h2 class="screen-title">LIVE МАТЧИ</h2>
+                <div id="all-matches-list"></div>
+            </div>
+
+            <div id="screen-detail" class="screen">
+                <button class="btn-back" onclick="App.switchTab('tournaments')">← Назад</button>
+                <div id="match-container"></div>
+            </div>
+
+            <div id="screen-stats" class="screen">
+                <h2 class="screen-title">РЕЙТИНГ ИГРОКОВ</h2>
+                <div id="leaderboard"></div>
+            </div>
+
+            <div id="screen-profile" class="screen">
+                <h2 class="screen-title">МОЙ ПРОФИЛЬ</h2>
+                <div id="user-profile"></div>
+            </div>
         </main>
 
         <nav class="bottom-nav" id="bottom-nav"></nav>
