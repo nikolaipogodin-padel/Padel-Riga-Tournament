@@ -1,106 +1,145 @@
-// [cite: 13, 20]
-let state = {
-    currentScreen: 'dashboard',
-    players: JSON.parse(localStorage.getItem('padel_players')) || [],
-    waitingList: JSON.parse(localStorage.getItem('padel_waiting')) || [],
-    currentTour: 1,
-    matches: []
+const App = {
+    state: {
+        tab: 'tournaments',
+        editingId: null,
+        // Имитация базы данных
+        myGames: [
+            { id: 1, p1: "Николай / Андрей", p2: "Виктор / Дмитрий", s1: 6, s2: 4, court: 1, status: "finished" },
+            { id: 2, p1: "Николай / Андрей", p2: "Алексей / Сергей", s1: 2, s2: 3, court: 2, status: "live" }
+        ],
+        liveTournament: [
+            { id: 10, p1: "Юрис / Гинтс", p2: "Артур / Денис", s1: 5, s2: 5, court: 3, status: "live" },
+            { id: 11, p1: "Максим / Игорь", p2: "Олег / Иван", s1: 6, s2: 1, court: 4, status: "finished" }
+        ],
+        future: [
+            { name: "Riga Masters 2026", date: "Воскресенье, 19:00", info: "14/16 игроков" },
+            { name: "Padel Night", date: "24 Апреля, 21:00", info: "Свободно 2 места" }
+        ]
+    },
+
+    init() {
+        this.render();
+    },
+
+    setTab(t) {
+        this.state.tab = t;
+        this.state.editingId = null;
+        this.render();
+    },
+
+    openManage(id) {
+        this.state.editingId = id;
+        this.render();
+    },
+
+    render() {
+        const root = document.getElementById('main-content');
+        root.innerHTML = ''; 
+
+        if (this.state.editingId) {
+            this.renderManage(root);
+        } else {
+            this.renderHeader(root);
+            if (this.state.tab === 'tournaments') {
+                this.renderTournamentList(root);
+            } else if (this.state.tab === 'matches') {
+                this.renderLiveTab(root);
+            } else {
+                this.renderPlaceholder(root);
+            }
+        }
+        this.renderNav();
+    },
+
+    renderHeader(root) {
+        const h = document.createElement('div');
+        h.className = 'app-header';
+        h.innerHTML = `<h1 class="neon-title">Padel Riga</h1>`;
+        root.appendChild(h);
+    },
+
+    renderTournamentList(root) {
+        // Мои игры
+        let html = `<div class="section"><div class="section-title">Мои текущие матчи</div>`;
+        this.state.myGames.forEach(g => {
+            html += this.createMatchCard(g);
+        });
+        html += `</div>`;
+
+        // Будущие турниры
+        html += `<div class="section"><div class="section-title">Предстоящие события</div>`;
+        this.state.future.forEach(f => {
+            html += `
+                <div class="card" style="border-style: dashed; opacity: 0.7;">
+                    <div style="font-weight:700; font-size:16px;">${f.name}</div>
+                    <div style="font-size:12px; color:var(--text-dim); margin-top:4px;">${f.date} • ${f.info}</div>
+                </div>`;
+        });
+        html += `</div>`;
+        root.innerHTML += html;
+    },
+
+    renderLiveTab(root) {
+        let html = `<div class="section"><div class="section-title">Прямой эфир (Все корты)</div>`;
+        this.state.liveTournament.forEach(g => {
+            html += this.createMatchCard(g);
+        });
+        html += `</div>`;
+        root.innerHTML += html;
+    },
+
+    createMatchCard(g) {
+        return `
+            <div class="card" onclick="App.openManage(${g.id})">
+                <div class="flex-center">
+                    <div class="player-box">${g.p1}</div>
+                    <div class="score-main">${g.s1}:${g.s2}</div>
+                    <div class="player-box" style="text-align:right">${g.p2}</div>
+                </div>
+                <div class="court-tag">КОРТ ${g.court} • ${g.status.toUpperCase()}</div>
+            </div>`;
+    },
+
+    renderManage(root) {
+        const g = [...this.state.myGames, ...this.state.liveTournament].find(x => x.id === this.state.editingId);
+        root.innerHTML = `
+            <div class="manage-view">
+                <button class="close-btn" onclick="App.setTab('tournaments')">✕</button>
+                <h2 style="margin-top:60px; font-weight:900;">Ввод счета</h2>
+                <p style="color:var(--text-dim); margin-bottom:40px;">Корт ${g.court} • ${g.p1} vs ${g.p2}</p>
+                
+                <div class="flex-center" style="justify-content:center">
+                    <input type="number" class="big-score-input" value="${g.s1}" onchange="App.saveScore(${g.id}, 1, this.value)">
+                    <div style="font-size:30px; font-weight:900; color:#222">:</div>
+                    <input type="number" class="big-score-input" value="${g.s2}" onchange="App.saveScore(${g.id}, 2, this.value)">
+                </div>
+
+                <button class="save-btn" onclick="App.setTab('tournaments')">СОХРАНИТЬ РЕЗУЛЬТАТ</button>
+            </div>
+        `;
+    },
+
+    saveScore(id, team, val) {
+        const g = [...this.state.myGames, ...this.state.liveTournament].find(x => x.id === id);
+        if (team === 1) g.s1 = parseInt(val) || 0;
+        else g.s2 = parseInt(val) || 0;
+    },
+
+    renderPlaceholder(root) {
+        root.innerHTML += `
+            <div style="text-align:center; padding-top:100px;">
+                <div style="font-size:40px; margin-bottom:20px;">🔒</div>
+                <div style="color:var(--text-dim); font-weight:700;">Раздел ${this.state.tab.toUpperCase()}<br>будет доступен после авторизации</div>
+            </div>`;
+    },
+
+    renderNav() {
+        const nav = document.getElementById('bottom-nav');
+        const items = [{id:'tournaments', i:'🏆'}, {id:'matches', i:'🎾'}, {id:'stats', i:'📊'}, {id:'profile', i:'👥'}];
+        nav.innerHTML = items.map(item => `
+            <div class="nav-btn ${this.state.tab === item.id ? 'active' : ''}" onclick="App.setTab('${item.id}')">${item.i}</div>
+        `).join('');
+    }
 };
 
-// Функция переключения экранов [cite: 15]
-function switchScreen(screenId) {
-    state.currentScreen = screenId;
-    
-    // Скрываем все экраны
-    document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
-    
-    // Показываем нужный
-    const target = document.getElementById(`screen-${screenId}`);
-    if(target) target.classList.remove('hidden');
-
-    // Обновляем навигацию
-    document.querySelectorAll('.nav-item').forEach(btn => {
-        btn.classList.remove('active');
-        if(btn.getAttribute('onclick').includes(screenId)) btn.classList.add('active');
-    });
-
-    // Вызываем рендер специфичный для экрана
-    if(screenId === 'registration') renderRegistration();
-    if(screenId === 'dashboard') renderDashboard();
-    if(screenId === 'live') renderLive();
-    if(screenId === 'leaderboard') renderLeaderboard();
-}
-
-// Логика регистрации [cite: 17, 36, 41]
-function handleRegister() {
-    const input = document.getElementById('player-name-input');
-    const name = input.value.trim();
-    
-    if(!name) return;
-
-    if(state.players.length < 16) {
-        state.players.push(name);
-    } else {
-        state.waitingList.push(name);
-    }
-
-    input.value = '';
-    localStorage.setItem('padel_players', JSON.stringify(state.players));
-    localStorage.setItem('padel_waiting', JSON.stringify(state.waitingList));
-    
-    renderRegistration();
-    renderDashboard(); // Обновляем счетчик на главном
-}
-
-function renderRegistration() {
-    const mainList = document.getElementById('list-main');
-    const waitList = document.getElementById('list-wait');
-    
-    mainList.innerHTML = state.players.map(p => `
-        <li class="bg-[#161b22] p-3 rounded-lg flex justify-between border border-white/5">${p}</li>
-    `).join('');
-    
-    waitList.innerHTML = state.waitingList.map(p => `
-        <li>${p}</li>
-    `).join('');
-
-    document.getElementById('count-main').innerText = state.players.length;
-    document.getElementById('count-wait').innerText = state.waitingList.length;
-}
-
-function renderDashboard() {
-    document.getElementById('reg-count-display').innerText = state.players.length;
-    const myCont = document.getElementById('my-tournaments');
-    // Временно для теста: если игрок есть в списке, показываем "Вы участвуете"
-    if(state.players.length > 0) {
-        myCont.innerHTML = `<div class="bg-blue-600/10 border border-blue-500/30 p-4 rounded-2xl text-xs font-bold text-blue-400">Padel Riga Open: Вы в списке!</div>`;
-    }
-}
-
-function renderLive() {
-    const tabs = document.getElementById('tour-tabs');
-    tabs.innerHTML = [1,2,3,4,5,6,7].map(t => `
-        <button class="tour-tab ${state.currentTour === t ? 'active' : ''}" onclick="state.currentTour=${t}; renderLive();">ТУР ${t}</button>
-    `).join('');
-    
-    document.getElementById('current-tour-label').innerText = `Тур ${state.currentTour}`;
-    
-    const grid = document.getElementById('match-grid');
-    grid.innerHTML = `<div class="text-center py-10 text-slate-600 text-xs italic">Сетка будет сформирована за 24 часа до старта [cite: 41, 55]</div>`;
-}
-
-function renderLeaderboard() {
-    const body = document.getElementById('leaderboard-body');
-    body.innerHTML = state.players.map(p => `
-        <tr class="border-b border-white/5">
-            <td class="p-4 font-bold">${p}</td>
-            <td class="p-4 text-center text-slate-400">0</td>
-            <td class="p-4 text-right text-blue-500 font-black">0</td>
-        </tr>
-    `).join('');
-}
-
-// Инициализация
-window.onload = () => {
-    switchScreen('dashboard');
-};
+App.init();
