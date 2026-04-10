@@ -3,66 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Padel Riga Pro</title>
+    <title>Padel Riga Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    <header class="app-header">
-        <h1 class="neon-title">Padel Riga</h1>
-    </header>
+<body class="bg-[#05070a] text-white font-['Inter'] antialiased">
 
-    <main id="main-content">
-        <section id="screen-tournaments" class="screen active">
-            <div class="label">Мои активные матчи</div>
-            <div id="my-list"></div>
-            <div class="label">Будущие турниры</div>
-            <div id="future-list"></div>
-        </section>
-
-        <section id="screen-matches" class="screen">
-            <div class="label">Прямой эфир / Все корты</div>
-            <div id="live-list"></div>
-        </section>
-
-        <section id="screen-stats" class="screen">
-            <div class="label">Топ игроков сезона</div>
-            <div id="stats-list"></div>
-        </section>
-
-        <section id="screen-profile" class="screen">
-            <div class="profile-card">
-                <div class="avatar">👤</div>
-                <h2>Николай Рига</h2>
-                <div class="rank-badge">GOLD CLASS</div>
-                <div class="stats-grid">
-                    <div><small>Rating</small><br><b>1450</b></div>
-                    <div><small>Matches</small><br><b>32</b></div>
-                    <div><small>Wins</small><br><b>24</b></div>
-                </div>
-            </div>
-        </section>
+    <main id="app" class="pb-24 min-h-screen">
+        <div id="screen-content" class="p-4"></div>
     </main>
 
-    <div id="modal-score" class="modal">
-        <div class="modal-body">
-            <button class="modal-close" onclick="App.closeScore()">✕</button>
-            <h3 id="m-names">Счет матча</h3>
-            <div class="score-inputs">
-                <input type="number" id="s1" class="score-input">
-                <span class="sep">:</span>
-                <input type="number" id="s2" class="score-input">
+    <nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-md bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-3xl h-18 flex items-center justify-around px-6 z-50 shadow-2xl">
+        <button onclick="switchScreen('dashboard')" class="nav-item group" data-screen="dashboard">
+            <div class="flex flex-col items-center">
+                <svg class="w-6 h-6 mb-1 opacity-50 group-[.active]:opacity-100 group-[.active]:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                <span class="text-[10px] uppercase tracking-widest opacity-50 group-[.active]:opacity-100">Dashboard</span>
             </div>
-            <button class="save-btn" onclick="App.saveScore()">СОХРАНИТЬ</button>
-        </div>
-    </div>
-
-    <nav class="nav-bar">
-        <div class="nav-item active" onclick="App.switchTab('tournaments', this)">🏆</div>
-        <div class="nav-item" onclick="App.switchTab('matches', this)">🎾</div>
-        <div class="nav-item" onclick="App.switchTab('stats', this)">📊</div>
-        <div class="nav-item" onclick="App.switchTab('profile', this)">👥</div>
+        </button>
+        <button onclick="switchScreen('live')" class="nav-item group" data-screen="live">
+            <div class="flex flex-col items-center">
+                <div class="relative">
+                    <svg class="w-6 h-6 mb-1 opacity-50 group-[.active]:opacity-100 group-[.active]:text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15.536a5 5 0 001.414-1.414"></path><circle cx="12" cy="12" r="1"></circle></svg>
+                    <span class="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full animate-pulse group-[.active]:block hidden"></span>
+                </div>
+                <span class="text-[10px] uppercase tracking-widest opacity-50 group-[.active]:opacity-100">Live</span>
+            </div>
+        </button>
+        <button onclick="switchScreen('grid')" class="nav-item group" data-screen="grid">
+            <div class="flex flex-col items-center">
+                <svg class="w-6 h-6 mb-1 opacity-50 group-[.active]:opacity-100 group-[.active]:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+                <span class="text-[10px] uppercase tracking-widest opacity-50 group-[.active]:opacity-100">Grid</span>
+            </div>
+        </button>
+        <button onclick="switchScreen('stats')" class="nav-item group" data-screen="stats">
+            <div class="flex flex-col items-center">
+                <svg class="w-6 h-6 mb-1 opacity-50 group-[.active]:opacity-100 group-[.active]:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                <span class="text-[10px] uppercase tracking-widest opacity-50 group-[.active]:opacity-100">Stats</span>
+            </div>
+        </button>
     </nav>
 
-    <script src="app.js"></script>
+    <script src="app.js" type="module"></script>
 </body>
 </html>
