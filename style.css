@@ -1,43 +1,46 @@
-/* Custom Dark Theme Styles */
-:root {
-    --primary-blue: #3b82f6;
-    --win-green: #22c55e;
-    --lose-red: #ef4444;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+
+body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+.nav-item.active { color: #3b82f6; text-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
+
+.tournament-card {
+    background: linear-gradient(160deg, #11151c 0%, #07090d 100%);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
-body {
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-}
-
-.screen {
-    animation: fadeIn 0.3s ease-in-out;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* Card Styling */
 .match-card {
-    background: linear-gradient(145deg, #0f172a, #1e293b);
-    border: 1px solid #334155;
-    transition: all 0.2s;
+    background: #0f1218;
+    border-radius: 1.25rem;
+    padding: 1rem;
+    border: 1px solid rgba(255,255,255,0.05);
 }
 
-.match-card.completed {
-    border-color: #1e293b;
-    opacity: 0.8;
-}
+.match-card.finished { opacity: 0.6; background: #07090d; }
+.match-card.live { border-color: rgba(59, 130, 246, 0.4); box-shadow: 0 0 20px rgba(59, 130, 246, 0.1); }
+.match-card.future { border-style: dashed; opacity: 0.8; }
 
-/* Input Chrome Removal */
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
+.tour-tab {
+    padding: 0.5rem 1.25rem;
+    border-radius: 99px;
+    background: #11151c;
+    color: #475569;
+    font-size: 0.75rem;
+    font-weight: 700;
+    white-space: nowrap;
+    border: 1px solid transparent;
 }
+.tour-tab.active { background: #3b82f6; color: white; }
 
-.active-nav {
-    color: var(--primary-blue) !important;
-    border-bottom: 2px solid var(--primary-blue);
+.score-input {
+    background: #1e293b;
+    border-radius: 0.5rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    text-align: center;
+    font-weight: 900;
+    font-size: 1.125rem;
+    color: #3b82f6;
 }
