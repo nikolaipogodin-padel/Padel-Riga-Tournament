@@ -1,11 +1,11 @@
 
-const STORAGE_KEY = 'padel-riga-tracker-v26';
+const STORAGE_KEY = 'padel-riga-tracker-v27';
 
 const DEFAULT_STATE = {
   currentScreen: 'dashboard',
   activeTournamentId: 1,
   activeRound: 1,
-  registration: { playerName: '', playerLevel: '3.0', statusMessage: '' },
+  registration: { playerName: '', partnerName: '', statusMessage: '' },
   user: null,
   userDraft: {
     firstName: '',
@@ -13,26 +13,29 @@ const DEFAULT_STATE = {
     phone: '+371',
     level: 'C',
     gender: 'male',
-    birthDate: '',
+    birthDay: '',
+    birthMonth: '',
+    birthYear: '',
     photo: '',
     password: '',
     passwordRepeat: ''
   },
+  profileEditMode: false,
   profileStatusMessage: '',
   tournaments: [
-    { id: 1, type: 'my', title: 'Riga Evening Open', badgeTop: 'RIGA', badgeBottom: 'EVENING OPEN', date: '17 авг. 2023', city: 'Riga', time: '10:00', duration: '20 мин', status: 'LIVE', courts: 4, maxPlayers: 16, confirmedPlayers: 16, waitingPlayers: 0, allowRegistration: false },
-    { id: 2, type: 'my', title: 'Tallinn Padel Cup', badgeTop: 'TALLINN', badgeBottom: 'PADEL CUP', date: '25 авг. 2023', city: 'Tallinn', time: '11:30', duration: '30 мин', status: 'PLANNED', courts: 4, maxPlayers: 16, confirmedPlayers: 12, waitingPlayers: 0, allowRegistration: false },
-    { id: 3, type: 'available', title: 'Riga Morning Open', badgeTop: 'RIGA', badgeBottom: 'MORNING OPEN', date: '19 авг. 2023', city: 'Riga', time: '09:30', duration: '20 мин', status: 'OPEN', courts: 4, maxPlayers: 16, confirmedPlayers: 12, waitingPlayers: 0, allowRegistration: true },
-    { id: 4, type: 'available', title: 'Kaunas Padel Challenge', badgeTop: 'KAUNAS', badgeBottom: 'PADEL CHALLENGE', date: '21 авг. 2023', city: 'Kaunas', time: '12:00', duration: '30 мин', status: 'OPEN', courts: 4, maxPlayers: 16, confirmedPlayers: 8, waitingPlayers: 0, allowRegistration: true },
-    { id: 5, type: 'available', title: 'Autumn Slam', badgeTop: 'TARTU', badgeBottom: 'SUMMER CUP', date: '26 авг. 2023', city: 'Tartu', time: '10:00', duration: '20 мин', status: 'CLOSED', courts: 4, maxPlayers: 16, confirmedPlayers: 16, waitingPlayers: 4, allowRegistration: false }
+    { id: 1, type: 'my', title: 'Riga Evening Open', badgeTop: 'RIGA', badgeBottom: 'EVENING OPEN', date: '17 авг. 2023', city: 'Riga', time: '10:00', duration: '20 мин', status: 'LIVE', courts: 4, maxPlayers: 16, confirmedPlayers: 16, waitingPlayers: 0, daysLeft: 0, allowRegistration: false },
+    { id: 2, type: 'my', title: 'Tallinn Padel Cup', badgeTop: 'TALLINN', badgeBottom: 'PADEL CUP', date: '25 авг. 2023', city: 'Tallinn', time: '11:30', duration: '30 мин', status: 'PLANNED', courts: 4, maxPlayers: 16, confirmedPlayers: 12, waitingPlayers: 0, daysLeft: 8, allowRegistration: false },
+    { id: 3, type: 'available', title: 'Riga Morning Open', badgeTop: 'RIGA', badgeBottom: 'MORNING OPEN', date: '19 авг. 2023', city: 'Riga', time: '09:30', duration: '20 мин', status: 'OPEN', courts: 4, maxPlayers: 16, confirmedPlayers: 12, waitingPlayers: 0, daysLeft: 9, allowRegistration: true },
+    { id: 4, type: 'available', title: 'Kaunas Padel Challenge', badgeTop: 'KAUNAS', badgeBottom: 'PADEL CHALLENGE', date: '21 авг. 2023', city: 'Kaunas', time: '12:00', duration: '30 мин', status: 'OPEN', courts: 4, maxPlayers: 16, confirmedPlayers: 8, waitingPlayers: 0, daysLeft: 11, allowRegistration: true },
+    { id: 5, type: 'available', title: 'Autumn Slam', badgeTop: 'RIGA', badgeBottom: 'AUTUMN SLAM', date: '26 авг. 2023', city: 'Рига, Skunste', time: '10:00', duration: '20 мин', status: 'OPEN', courts: 4, maxPlayers: 16, confirmedPlayers: 0, waitingPlayers: 0, daysLeft: 15, allowRegistration: true }
   ],
   liveTournament: {
     rounds: [1, 2, 3, 4, 5, 6],
     matchesByRound: {
       1: [
+        { cardType: 'finished', winnerText: 'Победа: Николай / Андрей', setScores: ['6:4', '3:6', '6:2'], players: ['Николай', 'Андрей'] },
         { cardType: 'live', players: ['Николай', 'Виктор'], score: [6, 3], time: '10:30', court: 'Корт 1', duration: '21:00' },
-        { cardType: 'waiting', players: ['Алексей', 'Сергей'], score: null, time: '11:15', court: 'Корт 2', duration: '27:00' },
-        { cardType: 'waiting', players: ['Андрей', 'Марк'], score: null, time: '12:00', court: 'Корт 3', duration: '18:00' }
+        { cardType: 'waiting', players: ['Алексей', 'Сергей'], score: null, time: '11:15', court: 'Корт 2', duration: '27:00' }
       ],
       2: [
         { cardType: 'finished', winnerText: 'Победа: Николай / Андрей', setScores: ['6:4', '3:6', '6:2'], players: ['Николай', 'Андрей'] },
@@ -59,9 +62,9 @@ const DEFAULT_STATE = {
 let STORE = loadState();
 
 function loadState() {
+  const base = structuredClone(DEFAULT_STATE);
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    const base = structuredClone(DEFAULT_STATE);
+    const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('padel-riga-tracker-v26');
     if (!raw) {
       base.currentScreen = 'auth';
       return base;
@@ -81,14 +84,35 @@ function loadState() {
         }
       }
     };
+    migrateBirthFields(merged);
     if (!merged.user) merged.currentScreen = 'auth';
     return merged;
   } catch (error) {
     console.error('Failed to load state:', error);
-    const base = structuredClone(DEFAULT_STATE);
     base.currentScreen = 'auth';
     return base;
   }
+}
+
+function migrateBirthFields(state) {
+  const draft = state.userDraft || {};
+  if ((!draft.birthDay && !draft.birthMonth && !draft.birthYear) && draft.birthDate) {
+    const parts = String(draft.birthDate).split('-');
+    if (parts.length === 3) {
+      draft.birthYear = parts[0] || '';
+      draft.birthMonth = parts[1] || '';
+      draft.birthDay = parts[2] || '';
+    }
+  }
+  if (state.user && !state.user.birthDay && !state.user.birthMonth && !state.user.birthYear && state.user.birthDate) {
+    const parts = String(state.user.birthDate).split('-');
+    if (parts.length === 3) {
+      state.user.birthYear = parts[0] || '';
+      state.user.birthMonth = parts[1] || '';
+      state.user.birthDay = parts[2] || '';
+    }
+  }
+  delete draft.birthDate;
 }
 
 function persist() {
@@ -101,6 +125,10 @@ window.router = {
       STORE.currentScreen = 'auth';
     } else {
       STORE.currentScreen = screen;
+      if (screen !== 'profile') {
+        STORE.profileEditMode = false;
+        STORE.profileStatusMessage = '';
+      }
     }
     persist();
     render();
@@ -126,29 +154,70 @@ function iconClock() {
   return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5v5l3.5 2"></path></svg>';
 }
 
-function getUserInitials() {
-  if (!STORE.user) return 'PR';
-  return `${(STORE.user.firstName || 'P')[0] || 'P'}${(STORE.user.lastName || 'R')[0] || 'R'}`.toUpperCase();
+function escapeHtml(value) {
+  return String(value || '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;');
 }
 
 function getUserFullName() {
   if (!STORE.user) return '';
-  return `${STORE.user.firstName} ${STORE.user.lastName}`.trim();
+  return `${STORE.user.firstName || ''} ${STORE.user.lastName || ''}`.trim();
+}
+
+function getUserInitials() {
+  const fullName = getUserFullName();
+  return fullName.split(' ').filter(Boolean).slice(0, 2).map((part) => part[0]).join('').toUpperCase() || 'NP';
+}
+
+function buildBirthDate({ birthDay = '', birthMonth = '', birthYear = '' }) {
+  const dd = String(birthDay || '').padStart(2, '0');
+  const mm = String(birthMonth || '').padStart(2, '0');
+  const yyyy = String(birthYear || '');
+  if (!dd || !mm || !yyyy || yyyy.length !== 4) return '';
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+function formatBirthDate(source) {
+  const dd = String(source.birthDay || '').padStart(2, '0');
+  const mm = String(source.birthMonth || '').padStart(2, '0');
+  const yyyy = String(source.birthYear || '');
+  if (!dd || !mm || !yyyy) return 'Не указана';
+  return `${dd}.${mm}.${yyyy}`;
 }
 
 function getAuthErrors(draft) {
   const errors = {};
-  if (!draft.firstName.trim()) errors.firstName = 'Введите имя';
-  if (!draft.lastName.trim()) errors.lastName = 'Введите фамилию';
-  if (!draft.phone.trim() || draft.phone.trim() === '+371') errors.phone = 'Введите телефон';
-  if (!draft.password.trim()) errors.password = 'Введите пароль';
-  if (!draft.passwordRepeat.trim()) errors.passwordRepeat = 'Повторите пароль';
-  else if (draft.password !== draft.passwordRepeat) errors.passwordRepeat = 'Пароли не совпадают';
+  if (!String(draft.firstName || '').trim()) errors.firstName = 'Введите имя';
+  if (!String(draft.lastName || '').trim()) errors.lastName = 'Введите фамилию';
+  if (!String(draft.phone || '').trim() || String(draft.phone || '').trim() === '+371') errors.phone = 'Введите телефон';
+  if (!String(draft.password || '')) errors.password = 'Введите пароль';
+  if (!String(draft.passwordRepeat || '')) errors.passwordRepeat = 'Повторите пароль';
+  else if (String(draft.password || '') !== String(draft.passwordRepeat || '')) errors.passwordRepeat = 'Пароли не совпадают';
   return errors;
 }
 
 function isAuthValid() {
   return Object.keys(getAuthErrors(STORE.userDraft)).length === 0;
+}
+
+function profileDraftFromUser() {
+  if (!STORE.user) return structuredClone(DEFAULT_STATE.userDraft);
+  return {
+    firstName: STORE.user.firstName || '',
+    lastName: STORE.user.lastName || '',
+    phone: STORE.user.phone || '+371',
+    level: STORE.user.level || 'C',
+    gender: STORE.user.gender || 'male',
+    birthDay: STORE.user.birthDay || '',
+    birthMonth: STORE.user.birthMonth || '',
+    birthYear: STORE.user.birthYear || '',
+    photo: STORE.user.photo || '',
+    password: '',
+    passwordRepeat: ''
+  };
 }
 
 function renderHeaderAndNav() {
@@ -158,7 +227,7 @@ function renderHeaderAndNav() {
 
   if (!header || !nav) return;
 
-  if (!STORE.user) {
+  if (!STORE.user || ['auth', 'auth_success'].includes(STORE.currentScreen)) {
     header.style.display = 'none';
     nav.style.display = 'none';
     return;
@@ -166,10 +235,7 @@ function renderHeaderAndNav() {
 
   header.style.display = 'flex';
   nav.style.display = 'grid';
-
-  if (profileBtn) {
-    profileBtn.textContent = 'Profile';
-  }
+  if (profileBtn) profileBtn.textContent = 'Profile';
 
   document.querySelectorAll('.nav-item').forEach((btn) => {
     btn.classList.toggle('active', btn.dataset.screen === STORE.currentScreen);
@@ -187,34 +253,21 @@ const UI = {
           </button>
         </div>
         <div class="cards-track">${cardsHtml}</div>
-        <div class="card-dots">${Array.from({ length: dots }).map((_, index) => `<span class="${index === 1 ? 'active' : ''}"></span>`).join('')}</div>
+        <div class="card-dots">${Array.from({ length: Math.max(dots, 1) }).map((_, index) => `<span class="${index === 1 || (dots === 1 && index === 0) ? 'active' : ''}"></span>`).join('')}</div>
       </section>
     `;
   },
 
   tournamentCard(t) {
-    const cardClass =
-      t.status === 'LIVE' ? 'is-green' :
-      t.status === 'CLOSED' ? 'is-closed' :
-      t.status === 'OPEN' ? 'is-green' : '';
-
+    const cardClass = t.status === 'LIVE' ? 'is-green' : t.status === 'CLOSED' ? 'is-closed' : t.status === 'OPEN' ? 'is-green' : '';
     return `
       <article class="tournament-card ${cardClass}" onclick="openTournamentRegistration(${t.id})">
         <div class="card-shell">
           <div class="card-topline">${formatStatus(t.status)}</div>
-
           <div class="card-topline" style="margin-top: 14px;">
-            <div class="event-badge">
-              <div>
-                <strong>${t.badgeTop}</strong>
-                <strong>${t.badgeBottom}</strong>
-                <span>2023</span>
-              </div>
-            </div>
+            <div class="event-badge"><div><strong>${t.badgeTop}</strong><strong>${t.badgeBottom}</strong><span>2023</span></div></div>
           </div>
-
           <h3 class="card-title">${t.title}</h3>
-
           <div class="card-foot">
             <div class="meta-item">${iconCalendar()}<span>${t.date}</span></div>
             <div class="meta-item">${iconPin()}<span>${t.city}</span></div>
@@ -236,7 +289,7 @@ const UI = {
         <article class="match-card">
           <div class="card-shell">
             <div class="card-topline">${formatStatus('FINISHED')}</div>
-            <div class="match-overlay-icon" style="border-color: rgba(255,255,255,0.18); color: rgba(255,255,255,0.92); box-shadow:none;">Finished</div>
+            <div class="match-overlay-icon match-overlay-neutral">Finished</div>
             <div class="finished-panel"><strong>${match.winnerText}</strong></div>
             <div class="finished-scoreline">${match.setScores.map((score) => `<span>${score}</span>`).join('')}</div>
             <div class="players-row">
@@ -253,7 +306,7 @@ const UI = {
         <article class="match-card is-waiting">
           <div class="card-shell">
             <div class="card-topline">${formatStatus('PLANNED')}</div>
-            <div class="match-overlay-icon" style="border-color: rgba(255,255,255,0.14); color: rgba(255,255,255,0.82); box-shadow:none;">Waiting<br>VS</div>
+            <div class="match-overlay-icon match-overlay-neutral">Waiting<br>VS</div>
             <div class="players-row">
               <div class="player-name">${match.players[0]}</div>
               <div class="player-name" style="text-align:right;">${match.players[1]}</div>
@@ -276,17 +329,14 @@ const UI = {
             <div class="match-preview"></div>
           </div>
           <div class="match-overlay-icon">LIVE</div>
-
           <div class="players-row">
             <div class="player-name">${match.players[0]}</div>
             <div class="player-name" style="text-align:right;">${match.players[1]}</div>
           </div>
-
           <div class="score-row">
             <div class="score-box">${match.score[0]}</div>
             <div class="score-box">${match.score[1]}</div>
           </div>
-
           <div class="card-bottom-meta">
             <div>${match.time}</div>
             <div>${match.court}, ${match.duration}</div>
@@ -298,6 +348,113 @@ const UI = {
 };
 
 const Screens = {
+  auth() {
+    const draft = STORE.userDraft;
+    const errors = getAuthErrors(draft);
+
+    return `
+      <section class="auth-hero">
+        ${formatStatus('OPEN')}
+        <h2>Create profile</h2>
+        <p>Создай профиль один раз. После этого приложение будет входить автоматически и сразу открывать список турниров.</p>
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-label">Статус</div>
+            <div class="kpi-value" style="font-size:22px;">ACTIVE</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Доступ</div>
+            <div class="kpi-value" style="font-size:22px;">MULTICLUB</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="auth-shell">
+        <h2 class="board-title">Регистрация пользователя</h2>
+        <form id="auth-form" class="auth-form">
+          <div class="form-grid-2">
+            <div>
+              <label class="form-label" for="auth-first-name">Имя</label>
+              <input class="form-control" id="auth-first-name" name="firstName" type="text" placeholder="Nikolajs" value="${escapeHtml(draft.firstName)}" />
+              <div class="field-error" data-error-for="firstName">${errors.firstName || ''}</div>
+            </div>
+            <div>
+              <label class="form-label" for="auth-last-name">Фамилия</label>
+              <input class="form-control" id="auth-last-name" name="lastName" type="text" placeholder="Pogodins" value="${escapeHtml(draft.lastName)}" />
+              <div class="field-error" data-error-for="lastName">${errors.lastName || ''}</div>
+            </div>
+          </div>
+
+          <div>
+            <label class="form-label" for="auth-phone">Телефон</label>
+            <input class="form-control" id="auth-phone" name="phone" type="tel" placeholder="+371 2xxxxxxx" value="${escapeHtml(draft.phone)}" />
+            <div class="field-error" data-error-for="phone">${errors.phone || ''}</div>
+          </div>
+
+          <div class="form-grid-2">
+            <div>
+              <label class="form-label" for="auth-level">Уровень</label>
+              <select class="form-control" id="auth-level" name="level">
+                ${['A','B','C','D'].map((level) => `<option value="${level}" ${draft.level === level ? 'selected' : ''}>${level}</option>`).join('')}
+              </select>
+            </div>
+            <div>
+              <label class="form-label" for="auth-gender">Пол</label>
+              <select class="form-control" id="auth-gender" name="gender">
+                <option value="male" ${draft.gender === 'male' ? 'selected' : ''}>Мужчина</option>
+                <option value="female" ${draft.gender === 'female' ? 'selected' : ''}>Женщина</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="form-label">Дата рождения</label>
+            <div class="birth-grid">
+              <input class="form-control" name="birthDay" inputmode="numeric" maxlength="2" placeholder="ДД" value="${escapeHtml(draft.birthDay)}" />
+              <input class="form-control" name="birthMonth" inputmode="numeric" maxlength="2" placeholder="ММ" value="${escapeHtml(draft.birthMonth)}" />
+              <input class="form-control" name="birthYear" inputmode="numeric" maxlength="4" placeholder="ГГГГ" value="${escapeHtml(draft.birthYear)}" />
+            </div>
+          </div>
+
+          <div>
+            <label class="form-label" for="auth-photo">Фото</label>
+            <input class="form-control form-file" id="auth-photo" name="photo" type="file" accept="image/*" />
+          </div>
+
+          <div class="form-grid-2">
+            <div>
+              <label class="form-label" for="auth-password">Пароль</label>
+              <input class="form-control" id="auth-password" name="password" type="password" placeholder="••••••••" value="${escapeHtml(draft.password)}" />
+              <div class="field-error" data-error-for="password">${errors.password || ''}</div>
+            </div>
+            <div>
+              <label class="form-label" for="auth-password-repeat">Повтор пароля</label>
+              <input class="form-control" id="auth-password-repeat" name="passwordRepeat" type="password" placeholder="••••••••" value="${escapeHtml(draft.passwordRepeat)}" />
+              <div class="field-error" data-error-for="passwordRepeat">${errors.passwordRepeat || ''}</div>
+            </div>
+          </div>
+
+          <p class="form-note">Кнопка активна только когда обязательные поля заполнены и пароли совпадают. Фото можно добавить позже.</p>
+          <button id="auth-submit" type="submit" class="primary-btn" ${isAuthValid() ? '' : 'disabled'}>Создать профиль</button>
+        </form>
+      </section>
+    `;
+  },
+
+  auth_success() {
+    return `
+      <section class="auth-shell">
+        <div class="auth-success">
+          <div class="auth-success-icon">
+            <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"></path></svg>
+          </div>
+          <h2>Аккаунт создан</h2>
+          <p>Переходим к списку турниров…</p>
+        </div>
+      </section>
+    `;
+  },
+
   dashboard() {
     const my = STORE.tournaments.filter((item) => item.type === 'my');
     const available = STORE.tournaments.filter((item) => item.type === 'available');
@@ -309,17 +466,13 @@ const Screens = {
 
   live() {
     const currentMatches = STORE.liveTournament.matchesByRound[STORE.activeRound] || [];
-    const cards = currentMatches.length
-      ? currentMatches.map(UI.liveCard).join('')
-      : `<div class="empty-state">Для этого тура матчи еще не опубликованы</div>`;
+    const cards = currentMatches.length ? currentMatches.map(UI.liveCard).join('') : '<div class="empty-state">Для этого тура матчи еще не опубликованы</div>';
 
     return `
       <section class="section-shell">
         <div class="live-tabs">${STORE.liveTournament.rounds.map(UI.liveTab).join('')}</div>
         <div class="cards-track" style="margin-top:16px;">${cards}</div>
-        <div class="card-dots">
-          ${STORE.liveTournament.rounds.map((round) => `<span class="${round === STORE.activeRound ? 'active' : ''}"></span>`).join('')}
-        </div>
+        <div class="card-dots">${STORE.liveTournament.rounds.map((round) => `<span class="${round === STORE.activeRound ? 'active' : ''}"></span>`).join('')}</div>
       </section>
     `;
   },
@@ -337,9 +490,7 @@ const Screens = {
                   <div style="font-weight:700;">${item.title}</div>
                   <div class="grid-time">${item.time}</div>
                 </div>
-                <div class="status-pill ${item.state === 'LIVE' ? '' : 'planned'}" style="min-width:88px; justify-content:center;">
-                  ${item.state}
-                </div>
+                <div class="status-pill ${item.state === 'LIVE' ? '' : 'planned'}" style="min-width:88px; justify-content:center;">${item.state}</div>
               </div>
             </article>
           `).join('')}
@@ -374,172 +525,52 @@ const Screens = {
       STORE.tournaments.find((item) => item.allowRegistration) ||
       STORE.tournaments[2];
 
-    const confirmed = selectedTournament.confirmedPlayers;
-    const freeSlots = Math.max(0, selectedTournament.maxPlayers - confirmed);
-    const waiting = selectedTournament.waitingPlayers;
-    const successClass = STORE.registration.statusMessage ? 'show' : '';
+    const userName = STORE.user ? getUserFullName() : '';
+    const profileLevel = STORE.user ? STORE.user.level : '—';
 
     return `
-      <section class="registration-hero">
-        ${formatStatus(selectedTournament.status === 'OPEN' ? 'OPEN' : 'PLANNED')}
-        <h2>${selectedTournament.title}</h2>
-        <p>${selectedTournament.date} · ${selectedTournament.time} · ${selectedTournament.courts} корта</p>
+      <section class="section-shell">
+        <div class="registration-concept-card">
+          <div class="registration-concept-logo">Riga Autumn<br>Slam</div>
+          <h2 class="registration-concept-title">РЕГИСТРАЦИЯ:<br>${selectedTournament.title} 💎💎💎</h2>
 
-        <div class="kpi-grid">
-          <div class="kpi-card">
-            <div class="kpi-label">Свободно</div>
-            <div class="kpi-value">${freeSlots}</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-label">Waiting List</div>
-            <div class="kpi-value">${waiting}</div>
-          </div>
-        </div>
-      </section>
-
-      <section class="form-card">
-        <h2 class="board-title">Регистрация в турнир</h2>
-        <form id="registration-form" class="form-stack">
-          <div>
-            <label class="form-label" for="player-name">Имя и фамилия</label>
-            <input class="form-control" id="player-name" name="playerName" type="text" placeholder="Nikolajs Pogodins" value="${STORE.registration.playerName || getUserFullName() || ''}" required />
+          <div class="registration-tabs">
+            <button class="registration-tab active" type="button">ДАННЫЕ</button>
+            <button class="registration-tab muted" type="button">ПАРТНЕР</button>
+            <button class="registration-tab muted" type="button">ОПЛАТА</button>
           </div>
 
-          <div>
-            <label class="form-label" for="player-level">Уровень</label>
-            <select class="form-control" id="player-level" name="playerLevel">
-              <option value="A" ${STORE.registration.playerLevel === 'A' ? 'selected' : ''}>A — Высокий</option>
-              <option value="B" ${STORE.registration.playerLevel === 'B' ? 'selected' : ''}>B — Сильный</option>
-              <option value="C" ${STORE.registration.playerLevel === 'C' || STORE.registration.playerLevel === '3.0' ? 'selected' : ''}>C — Средний</option>
-              <option value="D" ${STORE.registration.playerLevel === 'D' ? 'selected' : ''}>D — Начинающий</option>
-            </select>
-          </div>
+          <form id="registration-form" class="registration-concept-form">
+            <label class="registration-label">Введите данные:</label>
+            <input class="form-control" id="player-name" name="playerName" type="text" placeholder="Ваше имя и фамилия" value="${escapeHtml(STORE.registration.playerName || userName)}" />
+            <button type="submit" class="primary-btn">ПОДТВЕРДИТЬ УЧАСТИЕ</button>
+          </form>
 
-          <p class="form-note">
-            Вход в клуб подтверждает админ. Снятие с турнира доступно до дедлайна — базово 24 часа до старта.
-          </p>
+          ${STORE.registration.statusMessage ? `<div class="inline-success">${STORE.registration.statusMessage}</div>` : ''}
 
-          <button type="submit" class="primary-btn">Подать заявку</button>
-        </form>
-
-        <div class="success-card ${successClass}" id="success-card">
-          <div class="status-pill" style="margin:0 auto;">OK</div>
-          <h3>${STORE.registration.statusMessage || ''}</h3>
-          <p>${STORE.registration.statusMessage ? 'Статус сохранен локально. Дальше подтверждение и модерация — по этапам разработки.' : ''}</p>
-        </div>
-      </section>
-    `;
-  },
-
-  auth() {
-    const draft = STORE.userDraft;
-    const errors = getAuthErrors(draft);
-    return `
-      <section class="auth-hero">
-        ${formatStatus('OPEN')}
-        <h2>Create profile</h2>
-        <p>Создай профиль один раз. После этого приложение будет входить автоматически и сразу открывать список турниров.</p>
-
-        <div class="kpi-grid">
-          <div class="kpi-card">
-            <div class="kpi-label">Статус</div>
-            <div class="kpi-value" style="font-size:22px;">ACTIVE</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-label">Доступ</div>
-            <div class="kpi-value" style="font-size:22px;">MULTI CLUB</div>
-          </div>
-        </div>
-      </section>
-
-      <section class="auth-shell">
-        <h2 class="board-title">Регистрация пользователя</h2>
-        <form id="auth-form" class="auth-form">
-          <div class="form-grid-2">
+          <div class="registration-facts">
             <div>
-              <label class="form-label" for="auth-first-name">Имя</label>
-              <input class="form-control" id="auth-first-name" name="firstName" type="text" placeholder="Nikolajs" value="${escapeHtml(draft.firstName)}" />
-              <div class="field-error">${errors.firstName || ''}</div>
+              <div class="registration-fact-label">До старта:</div>
+              <div class="registration-fact-value">${selectedTournament.daysLeft} дней</div>
             </div>
             <div>
-              <label class="form-label" for="auth-last-name">Фамилия</label>
-              <input class="form-control" id="auth-last-name" name="lastName" type="text" placeholder="Pogodins" value="${escapeHtml(draft.lastName)}" />
-              <div class="field-error">${errors.lastName || ''}</div>
+              <div class="registration-fact-label">Локация:</div>
+              <div class="registration-fact-value">📍 ${selectedTournament.city}</div>
+            </div>
+            <div>
+              <div class="registration-fact-label">Участники:</div>
+              <div class="registration-fact-value">${selectedTournament.confirmedPlayers}/${selectedTournament.maxPlayers}</div>
             </div>
           </div>
 
-          <div>
-            <label class="form-label" for="auth-phone">Телефон</label>
-            <input class="form-control" id="auth-phone" name="phone" type="tel" placeholder="+371 2xxxxxxx" value="${escapeHtml(draft.phone)}" />
-            <div class="field-error">${errors.phone || ''}</div>
+          <div class="profile-mini-card">
+            <div class="profile-mini-avatar">${STORE.user && STORE.user.photo ? `<img src="${STORE.user.photo}" alt="avatar" />` : getUserInitials()}</div>
+            <div>
+              <div class="profile-mini-name">${escapeHtml(userName || 'Профиль не создан')}</div>
+              <div class="profile-mini-sub">${escapeHtml(profileLevel)}</div>
+            </div>
+            <div class="profile-mini-badge">Platinum</div>
           </div>
-
-          <div class="form-grid-2">
-            <div>
-              <label class="form-label" for="auth-level">Уровень</label>
-              <select class="form-control" id="auth-level" name="level">
-                <option value="A" ${draft.level === 'A' ? 'selected' : ''}>A</option>
-                <option value="B" ${draft.level === 'B' ? 'selected' : ''}>B</option>
-                <option value="C" ${draft.level === 'C' ? 'selected' : ''}>C</option>
-                <option value="D" ${draft.level === 'D' ? 'selected' : ''}>D</option>
-              </select>
-            </div>
-            <div>
-              <label class="form-label" for="auth-gender">Пол</label>
-              <select class="form-control" id="auth-gender" name="gender">
-                <option value="male" ${draft.gender === 'male' ? 'selected' : ''}>Мужчина</option>
-                <option value="female" ${draft.gender === 'female' ? 'selected' : ''}>Женщина</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="form-grid-2">
-            <div>
-              <label class="form-label" for="auth-birth-date">Дата рождения</label>
-              <input class="form-control" id="auth-birth-date" name="birthDate" type="date" value="${escapeHtml(draft.birthDate)}" />
-              <div class="field-error"></div>
-            </div>
-            <div>
-              <label class="form-label" for="auth-photo">Фото</label>
-              <input class="form-control" id="auth-photo" name="photo" type="file" accept="image/*" />
-              <div class="field-error"></div>
-            </div>
-          </div>
-
-          <div class="form-grid-2">
-            <div>
-              <label class="form-label" for="auth-password">Пароль</label>
-              <input class="form-control" id="auth-password" name="password" type="password" placeholder="••••••••" value="${escapeHtml(draft.password)}" />
-              <div class="field-error">${errors.password || ''}</div>
-            </div>
-            <div>
-              <label class="form-label" for="auth-password-repeat">Повтор пароля</label>
-              <input class="form-control" id="auth-password-repeat" name="passwordRepeat" type="password" placeholder="••••••••" value="${escapeHtml(draft.passwordRepeat)}" />
-              <div class="field-error">${errors.passwordRepeat || ''}</div>
-            </div>
-          </div>
-
-          <p class="form-note">Кнопка активна только когда обязательные поля заполнены и пароли совпадают. Фото можно добавить позже.</p>
-
-          <button id="auth-submit" type="submit" class="primary-btn" ${isAuthValid() ? '' : 'disabled'}>Создать профиль</button>
-        </form>
-      </section>
-    `;
-  },
-
-  auth_success() {
-    const name = getUserFullName();
-    return `
-      <section class="auth-shell">
-        <div class="auth-success">
-          <div class="auth-success-icon">
-            <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
-              <path d="M5 13l4 4L19 7"></path>
-            </svg>
-          </div>
-          <h2 class="board-title" style="font-size:28px; margin-bottom:10px;">Аккаунт создан</h2>
-          <p class="muted-copy" style="margin:0 0 18px;">${name}, профиль сохранён. Перенаправляем на список турниров.</p>
-          <button class="primary-btn" type="button" onclick="router.navigate('dashboard')">Перейти сейчас</button>
         </div>
       </section>
     `;
@@ -550,104 +581,101 @@ const Screens = {
 
     const user = STORE.user;
     const initials = getUserInitials();
-    const draft = STORE.userDraft;
-    const errors = getAuthErrors({ ...draft, password: 'placeholder', passwordRepeat: 'placeholder' });
+    const isEdit = STORE.profileEditMode;
+    const draft = {
+      firstName: STORE.userDraft.firstName || user.firstName || '',
+      lastName: STORE.userDraft.lastName || user.lastName || '',
+      phone: STORE.userDraft.phone || user.phone || '+371',
+      level: STORE.userDraft.level || user.level || 'C',
+      gender: STORE.userDraft.gender || user.gender || 'male',
+      birthDay: STORE.userDraft.birthDay || user.birthDay || '',
+      birthMonth: STORE.userDraft.birthMonth || user.birthMonth || '',
+      birthYear: STORE.userDraft.birthYear || user.birthYear || '',
+      photo: STORE.userDraft.photo || user.photo || ''
+    };
+
     return `
       <section class="profile-shell">
-        <div class="profile-top">
-          <div class="avatar-ring">${user.photo ? `<img src="${user.photo}" alt="avatar" style="width:100%;height:100%;object-fit:cover;border-radius:999px;">` : initials}</div>
-          <div>
-            <h2 class="profile-name">${escapeHtml(getUserFullName())}</h2>
-            <div class="profile-sub">${escapeHtml(user.phone)} · статус ${user.status}</div>
+        <div class="profile-head-row">
+          <div class="profile-top">
+            <div class="avatar-ring">${user.photo ? `<img src="${user.photo}" alt="avatar" style="width:100%;height:100%;object-fit:cover;border-radius:999px;">` : initials}</div>
+            <div>
+              <h2 class="profile-name">${escapeHtml(getUserFullName())}</h2>
+              <div class="profile-sub">${escapeHtml(user.phone)} · статус ${user.status}</div>
+            </div>
           </div>
+          <button class="ghost-pill" type="button" onclick="toggleProfileEdit()">${isEdit ? 'Отмена' : 'Редактировать'}</button>
         </div>
 
         <div class="profile-meta-grid">
-          <div class="profile-meta-card">
-            <div class="label">Уровень</div>
-            <div class="value">${escapeHtml(user.level)}</div>
-          </div>
-          <div class="profile-meta-card">
-            <div class="label">Пол</div>
-            <div class="value">${user.gender === 'female' ? 'Женщина' : 'Мужчина'}</div>
-          </div>
-          <div class="profile-meta-card">
-            <div class="label">Дата рождения</div>
-            <div class="value">${escapeHtml(user.birthDate || 'Не указана')}</div>
-          </div>
-          <div class="profile-meta-card">
-            <div class="label">Клубы</div>
-            <div class="value">0 / можно несколько</div>
-          </div>
+          <div class="profile-meta-card"><div class="label">Уровень</div><div class="value">${escapeHtml(user.level)}</div></div>
+          <div class="profile-meta-card"><div class="label">Пол</div><div class="value">${user.gender === 'female' ? 'Женщина' : 'Мужчина'}</div></div>
+          <div class="profile-meta-card"><div class="label">Дата рождения</div><div class="value">${escapeHtml(formatBirthDate(user))}</div></div>
+          <div class="profile-meta-card"><div class="label">Клубы</div><div class="value">0 / можно несколько</div></div>
         </div>
 
-        <form id="profile-form" class="profile-form">
-          <div class="form-grid-2">
-            <div>
-              <label class="form-label" for="profile-first-name">Имя</label>
-              <input class="form-control" id="profile-first-name" name="firstName" type="text" value="${escapeHtml(draft.firstName || user.firstName)}" />
-              <div class="field-error">${errors.firstName || ''}</div>
+        ${isEdit ? `
+          <form id="profile-form" class="profile-form">
+            <div class="form-grid-2">
+              <div>
+                <label class="form-label" for="profile-first-name">Имя</label>
+                <input class="form-control" id="profile-first-name" name="firstName" type="text" value="${escapeHtml(draft.firstName)}" />
+              </div>
+              <div>
+                <label class="form-label" for="profile-last-name">Фамилия</label>
+                <input class="form-control" id="profile-last-name" name="lastName" type="text" value="${escapeHtml(draft.lastName)}" />
+              </div>
             </div>
-            <div>
-              <label class="form-label" for="profile-last-name">Фамилия</label>
-              <input class="form-control" id="profile-last-name" name="lastName" type="text" value="${escapeHtml(draft.lastName || user.lastName)}" />
-              <div class="field-error">${errors.lastName || ''}</div>
-            </div>
-          </div>
 
-          <div>
-            <label class="form-label" for="profile-phone">Телефон</label>
-            <input class="form-control" id="profile-phone" name="phone" type="tel" value="${escapeHtml(draft.phone || user.phone)}" />
-            <div class="field-error">${errors.phone || ''}</div>
-          </div>
+            <div>
+              <label class="form-label" for="profile-phone">Телефон</label>
+              <input class="form-control" id="profile-phone" name="phone" type="tel" value="${escapeHtml(draft.phone)}" />
+            </div>
 
-          <div class="form-grid-2">
-            <div>
-              <label class="form-label" for="profile-level">Уровень</label>
-              <select class="form-control" id="profile-level" name="level">
-                <option value="A" ${(draft.level || user.level) === 'A' ? 'selected' : ''}>A</option>
-                <option value="B" ${(draft.level || user.level) === 'B' ? 'selected' : ''}>B</option>
-                <option value="C" ${(draft.level || user.level) === 'C' ? 'selected' : ''}>C</option>
-                <option value="D" ${(draft.level || user.level) === 'D' ? 'selected' : ''}>D</option>
-              </select>
+            <div class="form-grid-2">
+              <div>
+                <label class="form-label" for="profile-level">Уровень</label>
+                <select class="form-control" id="profile-level" name="level">
+                  ${['A','B','C','D'].map((level) => `<option value="${level}" ${draft.level === level ? 'selected' : ''}>${level}</option>`).join('')}
+                </select>
+              </div>
+              <div>
+                <label class="form-label" for="profile-gender">Пол</label>
+                <select class="form-control" id="profile-gender" name="gender">
+                  <option value="male" ${draft.gender === 'male' ? 'selected' : ''}>Мужчина</option>
+                  <option value="female" ${draft.gender === 'female' ? 'selected' : ''}>Женщина</option>
+                </select>
+              </div>
             </div>
-            <div>
-              <label class="form-label" for="profile-gender">Пол</label>
-              <select class="form-control" id="profile-gender" name="gender">
-                <option value="male" ${(draft.gender || user.gender) === 'male' ? 'selected' : ''}>Мужчина</option>
-                <option value="female" ${(draft.gender || user.gender) === 'female' ? 'selected' : ''}>Женщина</option>
-              </select>
-            </div>
-          </div>
 
-          <div class="form-grid-2">
             <div>
-              <label class="form-label" for="profile-birth-date">Дата рождения</label>
-              <input class="form-control" id="profile-birth-date" name="birthDate" type="date" value="${escapeHtml(draft.birthDate || user.birthDate || '')}" />
-              <div class="field-error"></div>
+              <label class="form-label">Дата рождения</label>
+              <div class="birth-grid">
+                <input class="form-control" name="birthDay" inputmode="numeric" maxlength="2" placeholder="ДД" value="${escapeHtml(draft.birthDay)}" />
+                <input class="form-control" name="birthMonth" inputmode="numeric" maxlength="2" placeholder="ММ" value="${escapeHtml(draft.birthMonth)}" />
+                <input class="form-control" name="birthYear" inputmode="numeric" maxlength="4" placeholder="ГГГГ" value="${escapeHtml(draft.birthYear)}" />
+              </div>
             </div>
+
             <div>
               <label class="form-label" for="profile-photo">Фото</label>
-              <input class="form-control" id="profile-photo" name="photo" type="file" accept="image/*" />
-              <div class="field-error"></div>
+              <input class="form-control form-file" id="profile-photo" name="photo" type="file" accept="image/*" />
             </div>
-          </div>
 
-          <button id="profile-save" type="submit" class="primary-btn">Сохранить профиль</button>
-          ${STORE.profileStatusMessage ? `<button type="button" class="secondary-btn">${STORE.profileStatusMessage}</button>` : ''}
-        </form>
+            <button id="profile-save" type="submit" class="primary-btn">Сохранить профиль</button>
+            ${STORE.profileStatusMessage ? `<button type="button" class="secondary-btn">${STORE.profileStatusMessage}</button>` : ''}
+          </form>
+        ` : `
+          <div class="profile-summary-list">
+            <div class="summary-row"><span>Имя</span><strong>${escapeHtml(user.firstName)}</strong></div>
+            <div class="summary-row"><span>Фамилия</span><strong>${escapeHtml(user.lastName)}</strong></div>
+            <div class="summary-row"><span>Телефон</span><strong>${escapeHtml(user.phone)}</strong></div>
+          </div>
+        `}
       </section>
     `;
   }
 };
-
-function escapeHtml(value) {
-  return String(value || '')
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;');
-}
 
 function render() {
   const content = document.getElementById('screen-content');
@@ -658,8 +686,7 @@ function render() {
   }
 
   const screen = STORE.currentScreen;
-  const view = Screens[screen] ? Screens[screen]() : Screens.dashboard();
-  content.innerHTML = view;
+  content.innerHTML = (Screens[screen] || Screens.dashboard)();
   renderHeaderAndNav();
   bindScreenEvents();
 
@@ -673,9 +700,7 @@ function render() {
 
 function bindScreenEvents() {
   const registrationForm = document.getElementById('registration-form');
-  if (registrationForm) {
-    registrationForm.addEventListener('submit', handleTournamentRegistrationSubmit);
-  }
+  if (registrationForm) registrationForm.addEventListener('submit', handleTournamentRegistrationSubmit);
 
   const authForm = document.getElementById('auth-form');
   if (authForm) {
@@ -683,6 +708,7 @@ function bindScreenEvents() {
     authForm.addEventListener('input', handleAuthInput);
     const photoInput = document.getElementById('auth-photo');
     if (photoInput) photoInput.addEventListener('change', handleAuthPhotoChange);
+    syncAuthUi();
   }
 
   const profileForm = document.getElementById('profile-form');
@@ -694,7 +720,7 @@ function bindScreenEvents() {
   }
 }
 
-function updateUserDraftFromForm(form) {
+function updateDraftFromForm(form, includePasswords = true) {
   const formData = new FormData(form);
   STORE.userDraft = {
     ...STORE.userDraft,
@@ -703,29 +729,35 @@ function updateUserDraftFromForm(form) {
     phone: String(formData.get('phone') || '').trim(),
     level: String(formData.get('level') || 'C'),
     gender: String(formData.get('gender') || 'male'),
-    birthDate: String(formData.get('birthDate') || ''),
-    password: String(formData.get('password') || STORE.userDraft.password || ''),
-    passwordRepeat: String(formData.get('passwordRepeat') || STORE.userDraft.passwordRepeat || '')
+    birthDay: String(formData.get('birthDay') || '').replace(/\D/g, '').slice(0,2),
+    birthMonth: String(formData.get('birthMonth') || '').replace(/\D/g, '').slice(0,2),
+    birthYear: String(formData.get('birthYear') || '').replace(/\D/g, '').slice(0,4),
+    photo: STORE.userDraft.photo || ''
   };
+  if (includePasswords) {
+    STORE.userDraft.password = String(formData.get('password') || '');
+    STORE.userDraft.passwordRepeat = String(formData.get('passwordRepeat') || '');
+  }
+}
+
+function syncAuthUi() {
+  const errors = getAuthErrors(STORE.userDraft);
+  document.querySelectorAll('[data-error-for]').forEach((node) => {
+    const key = node.getAttribute('data-error-for');
+    node.textContent = errors[key] || '';
+  });
+  const submit = document.getElementById('auth-submit');
+  if (submit) submit.disabled = Object.keys(errors).length > 0;
 }
 
 function handleAuthInput(event) {
-  updateUserDraftFromForm(event.currentTarget);
+  updateDraftFromForm(event.currentTarget, true);
   persist();
-  render();
+  syncAuthUi();
 }
 
 function handleProfileInput(event) {
-  const formData = new FormData(event.currentTarget);
-  STORE.userDraft = {
-    ...STORE.userDraft,
-    firstName: String(formData.get('firstName') || '').trim(),
-    lastName: String(formData.get('lastName') || '').trim(),
-    phone: String(formData.get('phone') || '').trim(),
-    level: String(formData.get('level') || 'C'),
-    gender: String(formData.get('gender') || 'male'),
-    birthDate: String(formData.get('birthDate') || '')
-  };
+  updateDraftFromForm(event.currentTarget, false);
   persist();
 }
 
@@ -748,12 +780,12 @@ async function handleAuthPhotoChange(event) {
 async function handleProfilePhotoChange(event) {
   const file = event.target.files && event.target.files[0];
   if (!file) return;
-  const dataUrl = await fileToDataUrl(file);
-  STORE.userDraft.photo = dataUrl;
+  STORE.userDraft.photo = await fileToDataUrl(file);
   persist();
 }
 
 function createUserFromDraft() {
+  const birthDate = buildBirthDate(STORE.userDraft);
   return {
     id: Date.now(),
     firstName: STORE.userDraft.firstName.trim(),
@@ -761,63 +793,54 @@ function createUserFromDraft() {
     phone: STORE.userDraft.phone.trim(),
     level: STORE.userDraft.level,
     gender: STORE.userDraft.gender,
-    birthDate: STORE.userDraft.birthDate,
+    birthDay: STORE.userDraft.birthDay,
+    birthMonth: STORE.userDraft.birthMonth,
+    birthYear: STORE.userDraft.birthYear,
+    birthDate,
     photo: STORE.userDraft.photo || '',
-    status: 'active',
-    createdAt: new Date().toISOString()
+    status: 'active'
   };
 }
 
 function handleAuthSubmit(event) {
   event.preventDefault();
-  updateUserDraftFromForm(event.currentTarget);
+  updateDraftFromForm(event.currentTarget, true);
   const errors = getAuthErrors(STORE.userDraft);
   if (Object.keys(errors).length) {
-    persist();
-    render();
+    syncAuthUi();
     return;
   }
 
   STORE.user = createUserFromDraft();
-  STORE.profileStatusMessage = '';
   STORE.currentScreen = 'auth_success';
+  STORE.registration.playerName = getUserFullName();
+  STORE.profileEditMode = false;
+  STORE.profileStatusMessage = '';
   persist();
   render();
 }
 
 function handleProfileSubmit(event) {
   event.preventDefault();
-  const formData = new FormData(event.currentTarget);
-  const nextData = {
+  updateDraftFromForm(event.currentTarget, false);
+  if (!STORE.user) return;
+
+  STORE.user = {
     ...STORE.user,
-    firstName: String(formData.get('firstName') || '').trim(),
-    lastName: String(formData.get('lastName') || '').trim(),
-    phone: String(formData.get('phone') || '').trim(),
-    level: String(formData.get('level') || 'C'),
-    gender: String(formData.get('gender') || 'male'),
-    birthDate: String(formData.get('birthDate') || ''),
+    firstName: STORE.userDraft.firstName.trim(),
+    lastName: STORE.userDraft.lastName.trim(),
+    phone: STORE.userDraft.phone.trim(),
+    level: STORE.userDraft.level,
+    gender: STORE.userDraft.gender,
+    birthDay: STORE.userDraft.birthDay,
+    birthMonth: STORE.userDraft.birthMonth,
+    birthYear: STORE.userDraft.birthYear,
+    birthDate: buildBirthDate(STORE.userDraft),
     photo: STORE.userDraft.photo || STORE.user.photo || ''
   };
 
-  if (!nextData.firstName || !nextData.lastName || !nextData.phone) {
-    STORE.profileStatusMessage = 'Проверь обязательные поля';
-    persist();
-    render();
-    return;
-  }
-
-  STORE.user = nextData;
-  STORE.userDraft = {
-    ...STORE.userDraft,
-    firstName: nextData.firstName,
-    lastName: nextData.lastName,
-    phone: nextData.phone,
-    level: nextData.level,
-    gender: nextData.gender,
-    birthDate: nextData.birthDate,
-    photo: nextData.photo
-  };
-  STORE.profileStatusMessage = 'Профиль сохранён';
+  STORE.profileEditMode = false;
+  STORE.profileStatusMessage = 'Профиль обновлен';
   persist();
   render();
 }
@@ -826,23 +849,16 @@ function handleTournamentRegistrationSubmit(event) {
   event.preventDefault();
   const formData = new FormData(event.currentTarget);
   const playerName = String(formData.get('playerName') || '').trim();
-  const playerLevel = String(formData.get('playerLevel') || 'C');
-
   if (!playerName) return;
 
   STORE.registration.playerName = playerName;
-  STORE.registration.playerLevel = playerLevel;
-
   const tournament = STORE.tournaments.find((item) => item.id === STORE.activeTournamentId) || STORE.tournaments[2];
   const isWaiting = tournament.confirmedPlayers >= tournament.maxPlayers;
-  const savedStatus = isWaiting ? 'waiting' : 'pending';
-
   STORE.registrations.push({
     id: Date.now(),
     tournamentId: tournament.id,
     playerName,
-    playerLevel,
-    status: savedStatus,
+    status: isWaiting ? 'waiting' : 'pending',
     createdAt: new Date().toISOString()
   });
 
@@ -853,7 +869,6 @@ function handleTournamentRegistrationSubmit(event) {
     tournament.confirmedPlayers += 1;
     STORE.registration.statusMessage = 'Заявка отправлена';
   }
-
   persist();
   render();
 }
@@ -877,6 +892,15 @@ window.setActiveRound = function setActiveRound(round) {
   render();
 };
 
+window.toggleProfileEdit = function toggleProfileEdit() {
+  STORE.profileEditMode = !STORE.profileEditMode;
+  STORE.profileStatusMessage = '';
+  STORE.userDraft = profileDraftFromUser();
+  persist();
+  render();
+};
+
 document.addEventListener('DOMContentLoaded', () => {
+  if (STORE.user) STORE.userDraft = profileDraftFromUser();
   render();
 });
