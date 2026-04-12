@@ -527,23 +527,36 @@ const Screens = {
 
     const userName = STORE.user ? getUserFullName() : '';
     const profileLevel = STORE.user ? STORE.user.level : '—';
+    const alreadyJoined = STORE.registrations.some((item) => item.tournamentId === selectedTournament.id && item.status === 'joined');
 
     return `
       <section class="section-shell">
         <div class="registration-concept-card">
-          <div class="registration-concept-logo">Riga Autumn<br>Slam</div>
-          <h2 class="registration-concept-title">РЕГИСТРАЦИЯ:<br>${selectedTournament.title} 💎💎💎</h2>
+          <div class="registration-concept-logo">${escapeHtml(selectedTournament.badgeTop)}<br>${escapeHtml(selectedTournament.badgeBottom)}</div>
+          <h2 class="registration-concept-title">РЕГИСТРАЦИЯ:<br>${escapeHtml(selectedTournament.title)} 💎💎💎</h2>
 
           <div class="registration-tabs">
             <button class="registration-tab active" type="button">ДАННЫЕ</button>
-            <button class="registration-tab muted" type="button">ПАРТНЕР</button>
-            <button class="registration-tab muted" type="button">ОПЛАТА</button>
+            <button class="registration-tab muted" type="button">СТАТУС</button>
+            <button class="registration-tab muted" type="button">ПРОФИЛЬ</button>
+          </div>
+
+          <div class="registration-copy">
+            ${alreadyJoined
+              ? 'Вы уже в турнире. Профиль автоматически привязан, место сохранено за вами.'
+              : 'Используем ваш профиль автоматически. Одна кнопка — и вы сразу попадаете в турнир.'}
           </div>
 
           <form id="registration-form" class="registration-concept-form">
-            <label class="registration-label">Введите данные:</label>
-            <input class="form-control" id="player-name" name="playerName" type="text" placeholder="Ваше имя и фамилия" value="${escapeHtml(STORE.registration.playerName || userName)}" />
-            <button type="submit" class="primary-btn">ПОДТВЕРДИТЬ УЧАСТИЕ</button>
+            <div class="profile-linked-card">
+              <div class="profile-linked-label">Профиль участника</div>
+              <div class="profile-linked-name">${escapeHtml(userName || 'Профиль не создан')}</div>
+              <div class="profile-linked-sub">Уровень ${escapeHtml(profileLevel)} · ${STORE.user && STORE.user.gender === 'female' ? 'Женщина' : 'Мужчина'}</div>
+            </div>
+
+            <button type="submit" class="primary-btn" ${alreadyJoined ? 'disabled' : ''}>
+              ${alreadyJoined ? 'ВЫ УЖЕ В ТУРНИРЕ' : 'ПОДТВЕРДИТЬ УЧАСТИЕ'}
+            </button>
           </form>
 
           ${STORE.registration.statusMessage ? `<div class="inline-success">${STORE.registration.statusMessage}</div>` : ''}
@@ -569,7 +582,7 @@ const Screens = {
               <div class="profile-mini-name">${escapeHtml(userName || 'Профиль не создан')}</div>
               <div class="profile-mini-sub">${escapeHtml(profileLevel)}</div>
             </div>
-            <div class="profile-mini-badge">Platinum</div>
+            <div class="profile-mini-badge">${alreadyJoined ? 'Joined' : 'Ready'}</div>
           </div>
         </div>
       </section>
@@ -607,15 +620,21 @@ const Screens = {
           <button class="ghost-pill" type="button" onclick="toggleProfileEdit()">${isEdit ? 'Отмена' : 'Редактировать'}</button>
         </div>
 
-        <div class="profile-meta-grid">
-          <div class="profile-meta-card"><div class="label">Уровень</div><div class="value">${escapeHtml(user.level)}</div></div>
-          <div class="profile-meta-card"><div class="label">Пол</div><div class="value">${user.gender === 'female' ? 'Женщина' : 'Мужчина'}</div></div>
-          <div class="profile-meta-card"><div class="label">Дата рождения</div><div class="value">${escapeHtml(formatBirthDate(user))}</div></div>
-          <div class="profile-meta-card"><div class="label">Клубы</div><div class="value">0 / можно несколько</div></div>
-        </div>
+        ${!isEdit ? `
+          <div class="profile-meta-grid">
+            <div class="profile-meta-card"><div class="label">Уровень</div><div class="value">${escapeHtml(user.level)}</div></div>
+            <div class="profile-meta-card"><div class="label">Пол</div><div class="value">${user.gender === 'female' ? 'Женщина' : 'Мужчина'}</div></div>
+            <div class="profile-meta-card"><div class="label">Дата рождения</div><div class="value">${escapeHtml(formatBirthDate(user))}</div></div>
+            <div class="profile-meta-card"><div class="label">Клубы</div><div class="value">0 / можно несколько</div></div>
+          </div>
 
-        ${isEdit ? `
-          <form id="profile-form" class="profile-form">
+          <div class="profile-detail-card">
+            <div class="profile-detail-row"><span>Имя</span><strong>${escapeHtml(user.firstName)}</strong></div>
+            <div class="profile-detail-row"><span>Фамилия</span><strong>${escapeHtml(user.lastName)}</strong></div>
+            <div class="profile-detail-row"><span>Телефон</span><strong>${escapeHtml(user.phone)}</strong></div>
+          </div>
+        ` : `
+          <form id="profile-form" class="profile-form profile-form-tight">
             <div class="form-grid-2">
               <div>
                 <label class="form-label" for="profile-first-name">Имя</label>
@@ -663,18 +682,13 @@ const Screens = {
             </div>
 
             <button id="profile-save" type="submit" class="primary-btn">Сохранить профиль</button>
-            ${STORE.profileStatusMessage ? `<button type="button" class="secondary-btn">${STORE.profileStatusMessage}</button>` : ''}
+            ${STORE.profileStatusMessage ? `<div class="inline-success">${STORE.profileStatusMessage}</div>` : ''}
           </form>
-        ` : `
-          <div class="profile-summary-list">
-            <div class="summary-row"><span>Имя</span><strong>${escapeHtml(user.firstName)}</strong></div>
-            <div class="summary-row"><span>Фамилия</span><strong>${escapeHtml(user.lastName)}</strong></div>
-            <div class="summary-row"><span>Телефон</span><strong>${escapeHtml(user.phone)}</strong></div>
-          </div>
         `}
       </section>
     `;
   }
+
 };
 
 function render() {
@@ -847,28 +861,33 @@ function handleProfileSubmit(event) {
 
 function handleTournamentRegistrationSubmit(event) {
   event.preventDefault();
-  const formData = new FormData(event.currentTarget);
-  const playerName = String(formData.get('playerName') || '').trim();
-  if (!playerName) return;
+  if (!STORE.user) return;
 
-  STORE.registration.playerName = playerName;
   const tournament = STORE.tournaments.find((item) => item.id === STORE.activeTournamentId) || STORE.tournaments[2];
-  const isWaiting = tournament.confirmedPlayers >= tournament.maxPlayers;
+  const alreadyJoined = STORE.registrations.some((item) => item.tournamentId === tournament.id && item.status === 'joined');
+  if (alreadyJoined) {
+    STORE.registration.statusMessage = 'Вы уже в турнире';
+    persist();
+    render();
+    return;
+  }
+
+  const playerName = getUserFullName();
+  STORE.registration.playerName = playerName;
   STORE.registrations.push({
     id: Date.now(),
     tournamentId: tournament.id,
     playerName,
-    status: isWaiting ? 'waiting' : 'pending',
+    status: 'joined',
     createdAt: new Date().toISOString()
   });
 
-  if (isWaiting) {
-    tournament.waitingPlayers += 1;
-    STORE.registration.statusMessage = 'Вы в waiting list';
-  } else {
-    tournament.confirmedPlayers += 1;
-    STORE.registration.statusMessage = 'Заявка отправлена';
-  }
+  if (tournament.confirmedPlayers < tournament.maxPlayers) tournament.confirmedPlayers += 1;
+  tournament.type = 'my';
+  tournament.allowRegistration = false;
+  if (tournament.status === 'OPEN') tournament.status = 'PLANNED';
+
+  STORE.registration.statusMessage = 'Вы автоматически добавлены в турнир';
   persist();
   render();
 }
