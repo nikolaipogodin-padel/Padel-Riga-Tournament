@@ -1,59 +1,69 @@
 
-/*
-Step 3.2 — Tournament Engine (Tours Generator)
-Fixed pairs, minimal repeat opponents
-*/
+let user = JSON.parse(localStorage.getItem('user'));
 
-function generateSchedule(pairs, courts, rounds) {
-    let schedule = [];
-    let history = {};
-
-    function getMatchKey(a, b) {
-        return [a, b].sort().join("-");
-    }
-
-    for (let r = 0; r < rounds; r++) {
-        let used = new Set();
-        let roundMatches = [];
-
-        for (let i = 0; i < pairs.length; i++) {
-            if (used.has(i)) continue;
-
-            let bestOpponent = null;
-            let minPlayed = Infinity;
-
-            for (let j = i + 1; j < pairs.length; j++) {
-                if (used.has(j)) continue;
-
-                let key = getMatchKey(i, j);
-                let played = history[key] || 0;
-
-                if (played < minPlayed) {
-                    minPlayed = played;
-                    bestOpponent = j;
-                }
-            }
-
-            if (bestOpponent !== null) {
-                let key = getMatchKey(i, bestOpponent);
-                history[key] = (history[key] || 0) + 1;
-
-                roundMatches.push([pairs[i], pairs[bestOpponent]]);
-                used.add(i);
-                used.add(bestOpponent);
-            }
-        }
-
-        schedule.push(roundMatches.slice(0, courts));
-    }
-
-    return schedule;
+if(!user){
+  renderRegistration();
+}else{
+  renderDashboard();
 }
 
-// example
-const pairs = ["P1","P2","P3","P4","P5","P6","P7","P8"];
-const courts = 2;
-const rounds = 6;
+function renderRegistration(){
+  document.getElementById('app').innerHTML = `
+    <div class="card">
+      <h2>Регистрация</h2>
+      <input id="name" placeholder="Имя"><br><br>
+      <input id="phone" placeholder="Телефон"><br><br>
+      <input id="pass" type="password" placeholder="Пароль"><br><br>
+      <input id="pass2" type="password" placeholder="Повтор"><br><br>
+      <button onclick="register()">Создать</button>
+    </div>
+  `;
+}
 
-const schedule = generateSchedule(pairs, courts, rounds);
-console.log("Schedule:", schedule);
+function register(){
+  let name = document.getElementById('name').value;
+  let phone = document.getElementById('phone').value;
+  let pass = document.getElementById('pass').value;
+  let pass2 = document.getElementById('pass2').value;
+
+  if(!name || !phone || pass!==pass2){
+    alert('Ошибка заполнения');
+    return;
+  }
+
+  user = {name, phone, tournaments:[]};
+  localStorage.setItem('user', JSON.stringify(user));
+  renderDashboard();
+}
+
+let tournament = {
+  id:1,
+  name:"Morning Padel",
+  totalTime:180,
+  courts:2,
+  players:10,
+  max:16,
+  buffer:5
+};
+
+function renderDashboard(){
+  let status = tournament.players >= tournament.max ? "FULL" : "OPEN";
+
+  document.getElementById('app').innerHTML = `
+    <div class="card">
+      <h2>${tournament.name}</h2>
+      <p>Статус: ${status}</p>
+      <p>${tournament.players}/${tournament.max}</p>
+      <button onclick="join()">Войти</button>
+    </div>
+  `;
+}
+
+function join(){
+  if(!user.tournaments.includes(tournament.id)){
+    user.tournaments.push(tournament.id);
+    tournament.players++;
+    localStorage.setItem('user', JSON.stringify(user));
+    renderDashboard();
+  }
+}
