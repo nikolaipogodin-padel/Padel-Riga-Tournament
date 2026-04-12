@@ -1,33 +1,51 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Padel Riga Tracker</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Padel Riga Tournament | Premium Tracker</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* Временная заплатка, чтобы контент не пропадал, пока JS подгружается */
+        #app:empty::after {
+            content: "Загрузка Premium интерфейса...";
+            color: var(--accent-cyan);
+            display: block;
+            text-align: center;
+            margin-top: 50px;
+            font-family: 'Rajdhani', sans-serif;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+    </style>
 </head>
-<body class="bg-black text-white font-sans overflow-x-hidden">
-  <div id="app" class="min-h-screen flex flex-col pb-24"></div>
+<body>
 
-  <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 bg-opacity-90 bg-zinc-900 border-t border-white/5 pb-6 pt-3 px-6 flex justify-between items-center z-50 backdrop-blur-lg hidden">
-    <button onclick="window.router.navigate('dashboard')" class="nav-btn flex flex-col items-center gap-1 opacity-50" data-screen="dashboard">
-      <div class="w-6 h-6 flex items-center justify-center">🏆</div>
-      <span class="text-[10px] font-medium uppercase tracking-widest">Турниры</span>
-    </button>
-    <button onclick="window.router.navigate('live')" class="nav-btn flex flex-col items-center gap-1 opacity-50" data-screen="live">
-      <div class="w-6 h-6 flex items-center justify-center relative">
-        <div class="absolute -top-1 -right-1 w-2 h-2 bg-lime-400 rounded-full animate-pulse"></div>
-        🎾
-      </div>
-      <span class="text-[10px] font-medium uppercase tracking-widest">Live</span>
-    </button>
-    <button onclick="window.router.navigate('profile')" class="nav-btn flex flex-col items-center gap-1 opacity-50" data-screen="profile">
-      <div class="w-6 h-6 flex items-center justify-center">👤</div>
-      <span class="text-[10px] font-medium uppercase tracking-widest">Профиль</span>
-    </button>
-  </nav>
+    <nav class="navbar navbar-expand-lg glass-panel m-3">
+        <div class="container-fluid">
+            <a class="navbar-brand text-cyan font-bold" href="#" onclick="navigate('home')" style="font-family: 'Rajdhani', sans-serif; font-size: 1.5rem;">
+                PADEL RIGA <span style="color: var(--accent-pink);">v7.0</span>
+            </a>
+            <div id="nav-info" class="text-secondary small"></div>
+        </div>
+    </nav>
 
-  <script src="app.js"></script>
+    <main class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-10">
+                <div id="app"></div>
+            </div>
+        </div>
+    </main>
+
+    <script src="app.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
