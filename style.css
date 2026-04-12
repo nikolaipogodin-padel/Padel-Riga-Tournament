@@ -1,33 +1,81 @@
-/* Premium Glass Morphism & Neons */
+:root {
+  --lime: #d9ff00;
+  --dark-bg: #05070a;
+  --glass: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --purple-neon: rgba(191, 64, 255, 0.3);
+}
+
+body { 
+  background-color: var(--dark-bg); 
+  -webkit-tap-highlight-color: transparent;
+  color: white; 
+}
+
 .glass-card {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
 }
 
 .neon-border-purple {
-    border: 1px solid rgba(191, 64, 255, 0.3);
-    box-shadow: 0 0 15px rgba(191, 64, 255, 0.1);
+  border: 1px solid var(--purple-neon);
+  box-shadow: 0 0 15px rgba(191, 64, 255, 0.05);
 }
 
-.neon-text-cyan {
-    color: #00f2ff;
-    text-shadow: 0 0 8px rgba(0, 242, 255, 0.5);
+.neon-text-purple {
+  color: #e0acff;
+  text-shadow: 0 0 8px rgba(191, 64, 255, 0.5);
 }
 
-/* Анимация для Live-статуса */
-.pulse-dot {
-    width: 8px;
-    height: 8px;
-    background: #72ff59;
-    border-radius: 50%;
-    box-shadow: 0 0 10px #72ff59;
-    animation: pulse 2s infinite;
+.btn-primary {
+  background: var(--lime);
+  color: black;
+  font-weight: 700;
+  border-radius: 16px;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-@keyframes pulse {
-    0% { transform: scale(0.95); opacity: 0.7; }
-    70% { transform: scale(1.1); opacity: 1; }
-    100% { transform: scale(0.95); opacity: 0.7; }
+.btn-primary:disabled {
+  background: #2a2d35 !important;
+  color: #555 !important;
+  cursor: not-allowed;
+  opacity: 0.5;
 }
+
+.btn-primary:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.nav-btn.active { opacity: 1; color: var(--lime); }
+.nav-btn.active div { transform: scale(1.1); }
+
+.input-field {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  width: 100%;
+  outline: none;
+  transition: all 0.2s;
+  color: white;
+}
+
+.input-field:focus { 
+  border-color: var(--lime); 
+  background: rgba(255,255,255,0.08);
+}
+
+/* Chrome/Opera/Safari */
+::-webkit-input-placeholder { color: #555; }
+/* Firefox 19+ */
+::-moz-placeholder { color: #555; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade { animation: fadeIn 0.4s ease forwards; }
