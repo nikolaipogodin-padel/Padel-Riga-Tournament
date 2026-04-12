@@ -1,49 +1,47 @@
 :root {
-  --lime: #d9ff00;
-  --dark-bg: #05070a;
-  --glass: rgba(255, 255, 255, 0.03);
-  --glass-border: rgba(255, 255, 255, 0.08);
+  --lime: #a3e635;
+  --glass: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
 }
-
-body { background-color: var(--dark-bg); -webkit-tap-highlight-color: transparent; }
 
 .glass-card {
   background: var(--glass);
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--glass-border);
-  border-radius: 24px;
+  border-radius: 16px; /* Инвариант п.12 ТЗ */
 }
 
 .btn-primary {
   background: var(--lime);
   color: black;
-  font-weight: 700;
-  border-radius: 16px;
-  transition: all 0.2s ease;
+  font-weight: 900;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 15px rgba(163, 230, 53, 0.3);
 }
 
 .btn-primary:disabled {
-  background: #2a2d35;
-  color: #555;
+  background: #27272a;
+  color: #52525b;
+  box-shadow: none;
   cursor: not-allowed;
 }
 
-.nav-btn.active { opacity: 1; color: var(--lime); }
-
 .input-field {
-  background: rgba(255,255,255,0.05);
+  background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--glass-border);
-  border-radius: 14px;
-  padding: 12px 16px;
+  border-radius: 12px;
+  padding: 1rem;
   width: 100%;
+  color: white;
   outline: none;
-  transition: border-color 0.2s;
 }
 
-.input-field:focus { border-color: var(--lime); }
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+.input-field:focus {
+  border-color: var(--lime);
 }
-.animate-fade { animation: fadeIn 0.4s ease forwards; }
+
+.neon-glow {
+  box-shadow: 0 0 20px rgba(163, 230, 53, 0.15);
+}
