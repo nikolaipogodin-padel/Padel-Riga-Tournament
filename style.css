@@ -1,29 +1,61 @@
+/* style.css - PREMIUM v7.0 UPDATE */
+
 :root {
-  --lime: #a3e635;
-  --glass: rgba(255, 255, 255, 0.05);
-  --glass-border: rgba(255, 255, 255, 0.1);
+    /* Основная палитра */
+    --bg-dark: #0a0b10;
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    
+    /* Неоновые акценты */
+    --accent-cyan: #00f2ff;
+    --accent-pink: #ff00ea;
+    --text-main: #e0e0e0;
+    --text-dim: #a0a0a0;
+    
+    /* Градиенты */
+    --grad-primary: linear-gradient(135deg, #00f2ff 0%, #0072ff 100%);
 }
 
+body {
+    background-color: var(--bg-dark);
+    background-image: 
+        radial-gradient(circle at 10% 20%, rgba(0, 242, 255, 0.05) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(255, 0, 234, 0.05) 0%, transparent 20%);
+    color: var(--text-main);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+}
+
+/* Эффект стекла для карточек и форм */
 .glass-card {
-  background: var(--glass);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
-  border-radius: 16px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
 
-.btn-primary {
-  background: var(--lime);
-  color: black;
-  font-weight: 900;
-  border-radius: 12px;
-  transition: all 0.3s ease;
+/* Премиальная кнопка */
+.btn-premium {
+    background: var(--grad-primary);
+    color: #000;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    border: none;
+    box-shadow: 0 0 15px rgba(0, 242, 255, 0.4);
 }
 
-.input-field {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--glass-border);
-  border-radius: 12px;
-  padding: 1rem;
-  color: white;
+.btn-premium:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 25px rgba(0, 242, 255, 0.6);
+}
+
+.btn-premium:disabled {
+    background: #333;
+    color: #666;
+    box-shadow: none;
+    cursor: not-allowed;
 }
