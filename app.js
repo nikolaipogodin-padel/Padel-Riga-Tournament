@@ -1,173 +1,170 @@
 /**
- * Padel Riga Tracker v31
- * Инварианты п.19 соблюдены.
+ * Padel Riga Tracker v32 (Engine + Premium UI)
+ * Соответствует ТЗ v7.0
  */
 
-const STORAGE_KEY = 'padel-riga-tracker-v31';
+const STORAGE_KEY = 'padel-riga-tracker-v32';
 
-const generateId = (prefix) => `${prefix}_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
-
+// В v32 храним пользователей отдельно, чтобы избежать дублирования (BUG-001)
 const DEFAULT_STATE = {
   currentScreen: 'auth',
-  user: null,
+  user: null, // Текущий залогиненный объект
+  users: [],  // Все зарегистрированные профили (п. 10 ТЗ)
   tournaments: [
     {
-      id: generateId('tour'),
+      id: 'tour_default_1',
       title: 'Padel Weekend Riga',
       status: 'OPEN',
-      participants: [],
+      participants: [], // Хранит только userId 
       waitlist: [],
       maxPlayers: 16,
-      startDate: '2026-04-20T10:00:00',
       courts: 4,
       totalTime: 120,
-      matches: []
+      buffer: 10
     }
-  ],
-  clubRequests: []
+  ]
 };
 
 let STORE = JSON.parse(localStorage.getItem(STORAGE_KEY)) || DEFAULT_STATE;
 
-const persist = () => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(STORE));
+const persist = () => localStorage.setItem(STORAGE_KEY, JSON.stringify(STORE));
+
+// --- Архитектурные исправления (п. 10 ТЗ) ---
+const getPlayerById = (id) => STORE.users.find(u => u.id === id);
+
+// --- Живая Валидация (п. 9 ТЗ) ---
+window.validateRegistration = () => {
+  const form = document.getElementById('reg-form');
+  if (!form) return;
+
+  const data = new FormData(form);
+  const firstName = data.get('firstName').trim();
+  const lastName = data.get('lastName').trim();
+  const phone = data.get('phone').trim();
+  
+  // Проверка по ТЗ [cite: 44, 45]
+  const isPhoneValid = /^\+371\d{8}$/.test(phone);
+  const isNameValid = firstName.length >= 2 && lastName.length >= 2;
+  
+  const btn = document.getElementById('reg-btn');
+  btn.disabled = !(isNameValid && isPhoneValid);
 };
 
-// --- Роутинг (Инвариант 19.3) ---
+// --- Логика турнира (п. 7, 8 ТЗ) ---
+window.joinTournament = (tourId) => {
+  if (!STORE.user) return window.router.navigate('auth');
+  
+  const t = STORE.tournaments.find(x => x.id === tourId);
+  const userId = STORE.user.id;
+
+  if (t.participants.includes(userId) || t.waitlist.includes(userId)) return;
+
+  if (t.participants.length < t.maxPlayers) {
+    t.participants.push(userId);
+    if (t.participants.length === t.maxPlayers) t.status = 'FULL'; [cite: 35]
+  } else {
+    t.waitlist.push(userId); [cite: 38]
+  }
+
+  persist();
+  render();
+};
+
+// --- Рендеринг экранов ---
+function render() {
+  const root = document.getElementById('app');
+  const nav = document.getElementById('bottom-nav');
+  nav.classList.toggle('hidden', STORE.currentScreen === 'auth');
+
+  if (STORE.currentScreen === 'auth') {
+    root.innerHTML = `
+      <div class="p-8 flex-1 flex flex-col justify-center animate-fade">
+        <div class="mb-10 text-center">
+          <div class="inline-block p-4 rounded-full bg-lime-400/10 mb-4 neon-glow">🎾</div>
+          <h1 class="text-3xl font-black italic tracking-tighter">PADEL <span class="text-lime-400">RIGA</span></h1>
+          <p class="text-gray-500 text-[10px] tracking-[0.4em] uppercase">Tracker Edition</p>
+        </div>
+        
+        <form id="reg-form" class="space-y-3" oninput="validateRegistration()">
+          <input name="firstName" placeholder="Имя" class="input-field" />
+          <input name="lastName" placeholder="Фамилия" class="input-field" />
+          <input name="phone" value="+371" class="input-field" />
+          <div class="flex gap-2">
+            <select name="level" class="input-field grow bg-black">
+              <option value="1">Уровень 1 (Новичок)</option>
+              <option value="2">Уровень 2</option>
+              <option value="3">Уровень 3</option>
+              <option value="4">Уровень 4</option>
+              <option value="5">Уровень 5 (PRO)</option>
+            </select>
+          </div>
+          <button id="reg-btn" type="button" disabled onclick="handleReg()" 
+            class="btn-primary w-full py-4 mt-4 uppercase tracking-widest">Зарегистрироваться</button>
+        </form>
+      </div>
+    `;
+  }
+
+  if (STORE.currentScreen === 'dashboard') {
+    root.innerHTML = `
+      <div class="p-6">
+        <h2 class="text-2xl font-bold mb-6">Турниры</h2>
+        <div class="space-y-4">
+          ${STORE.tournaments.map(t => {
+            const isParticipating = t.participants.includes(STORE.user?.id);
+            const isWaiting = t.waitlist.includes(STORE.user?.id);
+            
+            return `
+              <div class="glass-card p-5 relative overflow-hidden">
+                <div class="flex justify-between items-start mb-4">
+                  <span class="px-2 py-1 rounded text-[10px] font-black ${t.status === 'OPEN' ? 'bg-lime-400 text-black' : 'bg-zinc-800 text-zinc-400'}">
+                    ${t.status}
+                  </span>
+                  <span class="text-zinc-500 text-xs font-medium">${t.participants.length}/${t.maxPlayers} игроков</span>
+                </div>
+                <h3 class="text-lg font-bold mb-1">${t.title}</h3>
+                <p class="text-zinc-400 text-xs mb-6 italic">📍 Riga Padel Center</p>
+                
+                <button onclick="joinTournament('${t.id}')" 
+                  class="btn-primary w-full py-3 ${isParticipating || isWaiting ? 'opacity-50' : ''}">
+                  ${isParticipating ? 'ВЫ УЧАСТВУЕТЕ' : isWaiting ? 'В ОЧЕРЕДИ' : t.status === 'FULL' ? 'ВСТАТЬ В ОЧЕРЕДЬ' : 'ЗАПИСАТЬСЯ'}
+                </button>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  }
+  
+  // Обновление активных кнопок в Nav
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.classList.toggle('opacity-100', btn.dataset.screen === STORE.currentScreen);
+    btn.classList.toggle('text-lime-400', btn.dataset.screen === STORE.currentScreen);
+  });
+}
+
+window.handleReg = () => {
+  const form = document.getElementById('reg-form');
+  const d = Object.fromEntries(new FormData(form));
+  const newUser = {
+    id: `user_${Date.now()}`,
+    ...d,
+    joinedDate: new Date().toISOString()
+  };
+  
+  STORE.users.push(newUser);
+  STORE.user = newUser;
+  window.router.navigate('dashboard');
+};
+
+// Инвариант 19.3: Роутинг
 window.router = {
   navigate: (screen) => {
     STORE.currentScreen = screen;
     persist();
     render();
   }
-};
-
-// --- Хелперы ---
-const getUserFullName = (u) => u ? `${u.firstName} ${u.lastName}` : 'Гость';
-
-// --- Валидация (Инвариант 19.7) ---
-const validateRegistration = () => {
-  const form = document.getElementById('reg-form');
-  if (!form) return false;
-  const data = new FormData(form);
-  const isValid = data.get('firstName').length >= 2 && 
-                  data.get('lastName').length >= 2 && 
-                  /^\+371\d{8}$/.test(data.get('phone'));
-  
-  const btn = document.getElementById('reg-btn');
-  if (btn) btn.disabled = !isValid;
-};
-
-// --- Логика турнира ---
-window.joinTournament = (id) => {
-  if (!STORE.user) return window.router.navigate('auth');
-  const t = STORE.tournaments.find(x => x.id === id);
-  if (t.participants.length < t.maxPlayers) {
-    if (!t.participants.includes(STORE.user.id)) t.participants.push(STORE.user.id);
-  } else {
-    if (!t.waitlist.includes(STORE.user.id)) t.waitlist.push(STORE.user.id);
-  }
-  persist();
-  render();
-};
-
-// --- Рендеринг (Инвариант 19.2) ---
-function render() {
-  const root = document.getElementById('app');
-  const nav = document.getElementById('bottom-nav');
-  
-  // Управление видимостью навигации
-  nav.classList.toggle('hidden', STORE.currentScreen === 'auth');
-  document.querySelectorAll('.nav-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.screen === STORE.currentScreen);
-  });
-
-  switch (STORE.currentScreen) {
-    case 'auth':
-      root.innerHTML = `
-        <div class="p-8 flex-1 flex flex-col justify-center animate-fade">
-          <div class="mb-12 text-center">
-            <h1 class="text-4xl font-black italic tracking-tighter mb-2">PADEL <span class="text-lime-400">RIGA</span></h1>
-            <p class="text-gray-500 uppercase text-xs tracking-[0.3em]">Tracker Edition</p>
-          </div>
-          <form id="reg-form" class="space-y-4" oninput="validateRegistration()">
-            <input name="firstName" placeholder="Имя" class="input-field" />
-            <input name="lastName" placeholder="Фамилия" class="input-field" />
-            <input name="phone" value="+371" class="input-field" />
-            <select name="level" class="input-field bg-gray-900">
-               <option value="C">Уровень C (Средний)</option>
-               <option value="B">Уровень B (Продвинутый)</option>
-            </select>
-            <button id="reg-btn" type="button" disabled onclick="handleReg()" class="btn-primary w-full py-4 mt-6">ЗАРЕГИСТРИРОВАТЬСЯ</button>
-          </form>
-        </div>
-      `;
-      break;
-
-    case 'dashboard':
-      root.innerHTML = `
-        <div class="p-6 animate-fade">
-          <h2 class="text-2xl font-bold mb-6">Турниры</h2>
-          <div class="space-y-4">
-            ${STORE.tournaments.map(t => `
-              <div class="glass-card p-5 relative overflow-hidden">
-                <div class="flex justify-between items-start mb-4">
-                  <span class="bg-lime-400 text-black text-[10px] font-black px-2 py-1 rounded">${t.status}</span>
-                  <span class="text-gray-500 text-xs">${t.participants.length}/${t.maxPlayers} игроков</span>
-                </div>
-                <h3 class="text-xl font-bold mb-1">${t.title}</h3>
-                <p class="text-gray-400 text-sm mb-6">📍 Riga • 📅 20 Окт, 10:00</p>
-                <button onclick="joinTournament('${t.id}')" class="btn-primary w-full py-3">
-                  ${t.participants.includes(STORE.user?.id) ? 'ВЫ УЧАСТВУЕТЕ' : 'ЗАПИСАТЬСЯ'}
-                </button>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      `;
-      break;
-
-    case 'profile':
-      root.innerHTML = `
-        <div class="p-6 animate-fade">
-          <div class="flex flex-col items-center mt-8 mb-10">
-            <div class="w-24 h-24 bg-gray-800 rounded-full border-2 border-lime-400 mb-4 flex items-center justify-center text-3xl">👤</div>
-            <h2 class="text-2xl font-bold">${getUserFullName(STORE.user)}</h2>
-            <p class="text-lime-400 text-sm">Level ${STORE.user?.level || 'N/A'}</p>
-          </div>
-          <div class="glass-card p-2 space-y-1">
-            <div class="p-4 flex justify-between border-b border-white/5">
-              <span class="text-gray-500">Телефон</span>
-              <span class="font-medium">${STORE.user?.phone}</span>
-            </div>
-            <div class="p-4 flex justify-between">
-              <span class="text-gray-500">ID</span>
-              <span class="text-xs font-mono text-gray-600">${STORE.user?.id}</span>
-            </div>
-          </div>
-          <button onclick="logout()" class="w-full text-red-500 mt-12 text-sm font-bold uppercase tracking-widest">Выйти из аккаунта</button>
-        </div>
-      `;
-      break;
-  }
-}
-
-window.handleReg = () => {
-  const form = document.getElementById('reg-form');
-  const d = Object.fromEntries(new FormData(form));
-  STORE.user = {
-    id: generateId('user'),
-    ...d,
-    status: 'active',
-    clubs: [],
-    tournaments: []
-  };
-  window.router.navigate('dashboard');
-};
-
-window.logout = () => {
-  STORE.user = null;
-  window.router.navigate('auth');
 };
 
 document.addEventListener('DOMContentLoaded', render);
