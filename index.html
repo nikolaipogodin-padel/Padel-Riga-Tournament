@@ -10,71 +10,76 @@
 </head>
 <body>
 
-    <header class="sticky top-0 z-40 px-6 py-4 bg-[#0A0A0A]/80 backdrop-blur-md flex justify-between items-center">
+    <header class="sticky top-0 z-40 px-6 py-4 bg-[#0A0A0A]/90 backdrop-blur-xl flex justify-between items-center border-b border-white/5">
         <div class="flex items-center gap-3">
-            <div class="w-8 h-8 bg-[#BFFF00] rounded-lg flex items-center justify-center font-black text-black">P</div>
+            <div class="w-8 h-8 bg-[#BFFF00] rounded-lg flex items-center justify-center font-black text-black shadow-[0_0_15px_rgba(191,255,0,0.4)]">P</div>
             <span class="text-lg font-black uppercase tracking-tighter text-white">Padel <span class="text-[#BFFF00]">Riga</span></span>
         </div>
-        <div id="status-badge" class="hidden text-[9px] font-bold bg-[#BFFF00]/10 text-[#BFFF00] px-2 py-1 rounded-full border border-[#BFFF00]/20 uppercase">Cloud Sync</div>
+        <div id="status-badge" class="hidden text-[9px] font-black bg-[#BFFF00]/10 text-[#BFFF00] px-3 py-1 rounded-full border border-[#BFFF00]/20 uppercase tracking-tighter">Live Sync</div>
     </header>
 
     <main id="app-container">
         <section id="screen-registration" class="screen">
-            <div class="px-6 pt-2">
-                <div class="flex flex-col items-center mb-6">
-                    <div class="relative w-24 h-24 bg-[#1A1A1A] rounded-full border-2 border-dashed border-white/10 flex items-center justify-center overflow-hidden shadow-2xl">
-                        <span class="text-3xl">👤</span>
-                        <div class="absolute bottom-0 right-0 w-8 h-8 bg-[#BFFF00] rounded-full flex items-center justify-center text-black font-bold border-4 border-[#0A0A0A]">+</div>
+            <div class="px-6 pt-4">
+                <div class="flex flex-col items-center mb-8">
+                    <div class="group relative">
+                        <div class="w-24 h-24 bg-[#1A1A1A] rounded-full border border-white/10 flex items-center justify-center overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,1)]">
+                            <span class="text-3xl opacity-20">👤</span>
+                        </div>
+                        <div class="absolute -bottom-1 -right-1 w-8 h-8 bg-[#BFFF00] rounded-full flex items-center justify-center text-black font-bold border-[4px] border-[#0A0A0A] shadow-lg">+</div>
                     </div>
-                    <p class="text-[10px] text-gray-500 uppercase mt-2 font-bold tracking-widest">Добавить фото</p>
+                    <p class="text-[9px] text-gray-600 uppercase mt-3 font-black tracking-[0.2em]">Add Photo</p>
                 </div>
 
                 <div class="space-y-3">
                     <div class="grid grid-cols-2 gap-3">
-                        <input type="text" id="reg-firstname" placeholder="Имя" class="p-4 premium-card outline-none text-white text-sm">
-                        <input type="text" id="reg-lastname" placeholder="Фамилия" class="p-4 premium-card outline-none text-white text-sm">
+                        <input type="text" id="reg-firstname" placeholder="Имя" class="p-4 premium-input text-sm">
+                        <input type="text" id="reg-lastname" placeholder="Фамилия" class="p-4 premium-input text-sm">
                     </div>
-                    
                     <div class="flex gap-3">
-                        <div class="p-4 premium-card text-gray-500 text-sm w-16 text-center">+371</div>
-                        <input type="tel" id="reg-phone" placeholder="Номер телефона" class="flex-1 p-4 premium-card outline-none text-white text-sm">
+                        <div class="p-4 premium-input text-gray-500 text-sm w-16 text-center italic">+371</div>
+                        <input type="tel" id="reg-phone" placeholder="Номер телефона" class="flex-1 p-4 premium-input text-sm">
                     </div>
-
                     <div class="grid grid-cols-2 gap-3">
-                        <select id="reg-gender" class="p-4 premium-card text-white text-sm appearance-none">
-                            <option value="male">Мужской</option>
-                            <option value="female">Женский</option>
+                        <select id="reg-gender" class="p-4 premium-input text-sm appearance-none">
+                            <option value="male">Мужской пол</option>
+                            <option value="female">Женский пол</option>
                         </select>
-                        <select id="reg-level" class="p-4 premium-card text-white text-sm appearance-none">
+                        <select id="reg-level" class="p-4 premium-input text-sm appearance-none">
                             <option value="4.0">Уровень 4.0</option>
                             <option value="3.0">Уровень 3.0</option>
                             <option value="5.0">Уровень 5.0</option>
                         </select>
                     </div>
-
-                    <input type="password" id="reg-password" placeholder="Придумайте пароль" class="w-full p-4 premium-card outline-none text-white text-sm">
-
-                    <button onclick="auth.signUp()" id="reg-btn" class="w-full py-5 bg-[#BFFF00] text-black font-black rounded-2xl uppercase mt-4 shadow-[0_10px_30px_rgba(191,255,0,0.2)] active:scale-95 transition-all">Регистрация</button>
+                    <input type="password" id="reg-password" placeholder="Пароль" class="w-full p-4 premium-input text-sm">
+                    <button onclick="auth.signUp()" id="reg-btn" class="w-full py-5 bg-[#BFFF00] text-black font-black rounded-2xl uppercase mt-4 shadow-[0_20px_40px_rgba(191,255,0,0.25)] active:scale-[0.97] transition-all">Регистрация</button>
                 </div>
             </div>
         </section>
 
         <section id="screen-tournaments" class="screen">
-            <div class="p-6">
-                <h2 class="text-2xl font-black uppercase text-white mb-6 italic">Турниры</h2>
-                <div id="tournament-list" class="space-y-6">
-                    </div>
+            <div class="p-6 space-y-8">
+                <div>
+                    <h2 class="text-[10px] font-black uppercase text-gray-500 tracking-[0.2em] mb-4">Мои Турниры</h2>
+                    <div id="my-tournaments" class="space-y-4">
+                        </div>
+                </div>
+                <div>
+                    <h2 class="text-[10px] font-black uppercase text-gray-500 tracking-[0.2em] mb-4">Доступные</h2>
+                    <div id="available-tournaments" class="space-y-4">
+                        </div>
+                </div>
             </div>
         </section>
 
         <section id="screen-profile" class="screen">
-            <div class="flex flex-col items-center pt-10 pb-8">
-                <div class="w-24 h-24 rounded-[32px] bg-[#1A1A1A] border border-white/10 flex items-center justify-center text-4xl mb-4 shadow-[0_20px_40px_rgba(0,0,0,0.5)]">👤</div>
-                <h2 id="p-name" class="text-2xl font-black uppercase text-white">---</h2>
-                <p id="p-id" class="text-gray-600 text-[10px] font-black uppercase mt-1 tracking-widest italic">ID: ---</p>
+            <div class="flex flex-col items-center pt-12 pb-8">
+                <div class="w-24 h-24 rounded-[32px] bg-gradient-to-br from-[#1A1A1A] to-[#0A0A0A] border border-white/10 flex items-center justify-center text-4xl mb-4 shadow-[0_30px_60px_rgba(0,0,0,0.8)]">👤</div>
+                <h2 id="p-name" class="text-2xl font-black uppercase text-white tracking-tighter">---</h2>
+                <p id="p-id" class="text-[#BFFF00] text-[10px] font-black uppercase mt-1 tracking-widest italic opacity-80">ID: ---</p>
             </div>
-            <div class="px-6">
-                <button onclick="auth.logout()" class="w-full py-4 text-red-500/80 text-[10px] font-black uppercase tracking-widest border border-red-500/10 rounded-2xl">Выйти из аккаунта</button>
+            <div class="px-6 mt-10">
+                <button onclick="auth.logout()" class="w-full py-4 text-red-500/60 text-[10px] font-black uppercase tracking-[0.2em] border border-red-500/10 rounded-2xl bg-red-500/5">Выйти из аккаунта</button>
             </div>
         </section>
     </main>
