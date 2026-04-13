@@ -25,7 +25,7 @@
                 <div class="space-y-4 mt-6">
                     <input type="text" id="reg-name" placeholder="Имя Фамилия" class="w-full p-4 premium-card outline-none text-white">
                     <input type="tel" id="reg-phone" placeholder="+371..." class="w-full p-4 premium-card outline-none text-white">
-                    <button onclick="auth.signUp()" class="w-full py-5 bg-[#BFFF00] text-black font-black rounded-2xl uppercase mt-4">Начать играть</button>
+                    <button onclick="auth.signUp()" id="reg-btn" class="w-full py-5 bg-[#BFFF00] text-black font-black rounded-2xl uppercase mt-4 active:scale-95 transition-transform">Начать играть</button>
                 </div>
             </div>
         </section>
@@ -34,14 +34,32 @@
             <div class="p-6">
                 <h2 class="text-2xl font-black uppercase text-white mb-6">Турниры</h2>
                 <div id="tournament-list" class="space-y-4">
+                    <div class="premium-card p-5 border-l-4 border-red-500">
+                        <div class="flex justify-between items-center text-[10px] font-black uppercase mb-2">
+                            <span class="text-red-500">● LIVE</span>
+                            <span class="text-gray-500">16 Игроков</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-white uppercase italic">Evening Padel Cup</h3>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="screen-profile" class="screen">
+            <div class="flex flex-col items-center pt-10 pb-8">
+                <div class="w-20 h-20 rounded-3xl bg-[#BFFF00] flex items-center justify-center text-3xl mb-4 shadow-lg shadow-[#BFFF00]/20">👤</div>
+                <h2 id="p-name" class="text-2xl font-black uppercase text-white">Игрок</h2>
+                <p id="p-id" class="text-gray-600 text-[10px] font-black uppercase mt-1 tracking-widest italic">ID: 00000</p>
+            </div>
+            <div class="px-6">
+                <button onclick="auth.logout()" class="w-full py-4 text-red-500/80 text-[10px] font-black uppercase tracking-widest border border-red-500/10 rounded-2xl">Выйти из аккаунта</button>
             </div>
         </section>
     </main>
 
     <nav class="bottom-nav">
-        <button class="nav-item" onclick="ui.navigate('screen-tournaments')">🏆</button>
-        <button class="nav-item" onclick="ui.navigate('screen-profile')">👤</button>
+        <button class="nav-item active" id="nav-tournaments" onclick="ui.navigate('screen-tournaments')">🏆</button>
+        <button class="nav-item" id="nav-profile" onclick="ui.navigate('screen-profile')">👤</button>
     </nav>
 
     <script src="app.js"></script>
