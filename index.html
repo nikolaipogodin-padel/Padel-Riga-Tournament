@@ -1,97 +1,265 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Padel Riga Tracker</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            inter: ['Inter', 'system-ui', 'sans-serif']
-          }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Padel Riga Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --padel-neon: #BFFF00;
+            --bg-dark: #121212;
+            --card-bg: #1E1E1E;
+            --gray-text: #A0A0A0;
         }
-      }
-    }
-  </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css" />
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: white;
+            margin: 0;
+            padding-bottom: 80px;
+            overflow-x: hidden;
+        }
+
+        /* Premium Card Style */
+        .premium-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            transition: transform 0.2s ease;
+        }
+
+        .premium-card:active {
+            transform: scale(0.98);
+        }
+
+        /* Neon Accents */
+        .neon-border {
+            border: 1px solid var(--padel-neon);
+            box-shadow: 0 0 10px rgba(191, 255, 0, 0.2);
+        }
+
+        .neon-text {
+            color: var(--padel-neon);
+        }
+
+        .neon-btn {
+            background-color: var(--padel-neon);
+            color: black;
+            font-weight: 700;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .neon-btn:hover {
+            box-shadow: 0 0 15px rgba(191, 255, 0, 0.5);
+        }
+
+        /* Live Indicator Animation */
+        .live-pulse {
+            width: 8px;
+            height: 8px;
+            background-color: #ff4444;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(255, 68, 68, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 68, 68, 0); }
+        }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            background: rgba(30, 30, 30, 0.8);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item.active {
+            color: var(--padel-neon);
+        }
+
+        .screen { display: none; }
+        .screen.active { display: block; }
+    </style>
 </head>
-<body class="app-body text-white font-inter">
-  <div id="app-shell" class="app-shell">
-    <header id="main-header" class="main-header">
-      <div>
-        <p class="eyebrow">Padel Riga</p>
-        <h1 class="brand-title">PADEL RIGA</h1>
-      </div>
-      <button class="ghost-pill" type="button" onclick="router.navigate('profile')">Profile</button>
+<body>
+
+    <header class="p-6 flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 neon-btn flex items-center justify-center rounded-full">🎾</div>
+            <h1 class="text-xl font-bold uppercase tracking-wider">Padel <span class="neon-text">Riga</span></h1>
+        </div>
     </header>
 
-    <main id="screen-content" class="screen-content"></main>
+    <main id="app-container" class="px-5">
+        
+        <section id="screen-registration" class="screen active">
+            <h2 class="text-2xl font-semibold mb-6">Регистрация</h2>
+            <div class="space-y-4">
+                <input type="text" placeholder="Имя и Фамилия" class="w-full p-4 premium-card bg-transparent border-none focus:ring-1 focus:ring-[#BFFF00] outline-none">
+                <input type="tel" placeholder="+371 ..." class="w-full p-4 premium-card bg-transparent border-none outline-none">
+                <div class="flex gap-4">
+                    <select class="flex-1 p-4 premium-card bg-[#1E1E1E] border-none outline-none">
+                        <option>Уровень (1-5)</option>
+                        <option>1 - Новичок</option>
+                        <option>3 - Средний</option>
+                        <option>5 - Профи</option>
+                    </select>
+                    <select class="flex-1 p-4 premium-card bg-[#1E1E1E] border-none outline-none">
+                        <option>Пол</option>
+                        <option>Муж</option>
+                        <option>Жен</option>
+                    </select>
+                </div>
+                <button onclick="navigateTo('screen-tournaments')" class="w-full py-4 neon-btn mt-4 uppercase">Зарегистрироваться</button>
+            </div>
+        </section>
 
-    <nav class="bottom-nav">
-      <button class="nav-item active" data-screen="dashboard" onclick="router.navigate('dashboard')">
-        <span class="nav-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-            <path d="M3 10.5 12 3l9 7.5"></path>
-            <path d="M5 9.5V20h14V9.5"></path>
-          </svg>
-        </span>
-        <span>Dashboard</span>
-      </button>
+        <section id="screen-tournaments" class="screen">
+            <h2 class="text-2xl font-semibold mb-6">Турниры</h2>
+            <div id="tournament-list" class="space-y-4">
+                <div class="premium-card p-5 neon-border" onclick="navigateTo('screen-live')">
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="text-xs font-bold px-2 py-1 bg-red-600 rounded text-white"><span class="live-pulse"></span>LIVE</span>
+                        <span class="text-gray-400 text-sm">Корт 1-4</span>
+                    </div>
+                    <h3 class="text-lg font-bold">Evening Padel Cup</h3>
+                    <p class="text-sm text-gray-400 mb-4">Старт: 20:00 • 16/16 игроков</p>
+                    <button class="w-full py-2 border border-[#BFFF00] neon-text rounded-lg text-sm font-semibold">Смотреть Live</button>
+                </div>
 
-      <button class="nav-item" data-screen="live" onclick="router.navigate('live')">
-        <span class="nav-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-            <path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z"></path>
-            <path d="M4.9 4.9A10 10 0 0 0 2 12"></path>
-            <path d="M19.1 4.9A10 10 0 0 1 22 12"></path>
-            <path d="M4.9 19.1A10 10 0 0 1 2 12"></path>
-            <path d="M19.1 19.1A10 10 0 0 0 22 12"></path>
-          </svg>
-        </span>
-        <span>LIVE</span>
-      </button>
+                <div class="premium-card p-5">
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="text-xs font-bold px-2 py-1 bg-[#BFFF00] rounded text-black uppercase">Open</span>
+                        <span class="text-gray-400 text-sm">26 Oct, 10:00</span>
+                    </div>
+                    <h3 class="text-lg font-bold">Padel Weekend Riga</h3>
+                    <p class="text-sm text-gray-400 mb-4">Уровень 3-5 • 12/16 игроков</p>
+                    <button class="w-full py-2 neon-btn rounded-lg text-sm">Записаться</button>
+                </div>
+            </div>
+        </section>
 
-      <button class="nav-item" data-screen="grid" onclick="router.navigate('grid')">
-        <span class="nav-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-            <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
-            <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
-            <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
-            <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
-          </svg>
-        </span>
-        <span>Grid</span>
-      </button>
+        <section id="screen-live" class="screen">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-semibold">Evening Padel Cup</h2>
+                <span class="text-xs text-red-500 font-bold">LIVE</span>
+            </div>
+            
+            <div class="premium-card p-5 mb-8 border-l-4 border-[#BFFF00]">
+                <p class="text-xs text-[#BFFF00] font-bold uppercase mb-2">Твой следующий матч</p>
+                <div class="flex justify-between items-center">
+                    <div class="text-sm">
+                        <div class="font-bold">Вы & Напарник</div>
+                        <div class="text-gray-500 py-1">vs</div>
+                        <div class="font-bold text-gray-300">К. Волков & О. Петрова</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-2xl font-bold">Корт №3</div>
+                        <div class="text-xs text-gray-400">Тур 2 из 7 (через 10 мин)</div>
+                    </div>
+                </div>
+            </div>
 
-      <button class="nav-item" data-screen="stats" onclick="router.navigate('stats')">
-        <span class="nav-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-            <path d="M5 19V9"></path>
-            <path d="M12 19V5"></path>
-            <path d="M19 19v-7"></path>
-          </svg>
-        </span>
-        <span>Stats</span>
-      </button>
+            <h3 class="text-lg font-bold mb-4">Сетка (Round Robin)</h3>
+            <div class="premium-card overflow-hidden">
+                <table class="w-full text-sm text-left">
+                    <thead class="bg-[#2A2A2A] text-gray-400 uppercase text-xs">
+                        <tr>
+                            <th class="p-3">Пара</th>
+                            <th class="p-3 text-center">П</th>
+                            <th class="p-3 text-center">Сеты</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5">
+                        <tr>
+                            <td class="p-3 font-medium">1. Иванов / Петров</td>
+                            <td class="p-3 text-center font-bold neon-text">3</td>
+                            <td class="p-3 text-center text-gray-400">+12</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 font-medium text-gray-400">2. Берзиньш / Смит</td>
+                            <td class="p-3 text-center">2</td>
+                            <td class="p-3 text-center text-gray-400">+4</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
 
-      <button class="nav-item" data-screen="profile" onclick="router.navigate('profile')">
-        <span class="nav-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-            <path d="M12 5v14"></path>
-            <path d="M5 12h14"></path>
-          </svg>
-        </span>
-        <span>Profile</span>
-      </button>
+        <section id="screen-profile" class="screen">
+            <div class="text-center py-8">
+                <div class="w-24 h-24 mx-auto mb-4 rounded-full neon-border p-1">
+                    <div class="w-full h-full bg-[#333] rounded-full flex items-center justify-center text-3xl">👤</div>
+                </div>
+                <h2 class="text-2xl font-bold">Алексей Берзиньш</h2>
+                <p class="text-gray-500 text-sm">ID: 12345 • Уровень 4</p>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="premium-card p-4 text-center">
+                    <div class="text-2xl font-bold neon-text">24</div>
+                    <div class="text-xs text-gray-400 uppercase">Матчей</div>
+                </div>
+                <div class="premium-card p-4 text-center">
+                    <div class="text-2xl font-bold neon-text">68%</div>
+                    <div class="text-xs text-gray-400 uppercase">Побед</div>
+                </div>
+            </div>
+
+            <button onclick="location.reload()" class="w-full py-4 text-red-500 font-semibold border border-red-500/30 rounded-xl">Выйти из аккаунта</button>
+        </section>
+
+    </main>
+
+    <nav class="fixed bottom-0 left-0 right-0 bottom-nav h-20 flex justify-around items-center px-4 z-50">
+        <button onclick="navigateTo('screen-tournaments')" class="nav-item active flex flex-col items-center gap-1">
+            <span class="text-xl">🏆</span>
+            <span class="text-[10px] uppercase font-bold">Турниры</span>
+        </button>
+        <button onclick="navigateTo('screen-live')" class="nav-item flex flex-col items-center gap-1">
+            <span class="text-xl">🎾</span>
+            <span class="text-[10px] uppercase font-bold">Live</span>
+        </button>
+        <button onclick="navigateTo('screen-profile')" class="nav-item flex flex-col items-center gap-1">
+            <span class="text-xl">👤</span>
+            <span class="text-[10px] uppercase font-bold">Профиль</span>
+        </button>
     </nav>
-  </div>
 
-  <script src="app.js"></script>
+    <script>
+        // SPA Logic
+        function navigateTo(screenId) {
+            // Скрыть все экраны
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            // Показать нужный
+            document.getElementById(screenId).classList.add('active');
+            
+            // Обновить состояние навигации
+            document.querySelectorAll('.nav-item').forEach(nav => {
+                nav.classList.remove('active');
+                if(nav.getAttribute('onclick').includes(screenId)) {
+                    nav.classList.add('active');
+                }
+            });
+            
+            // Прокрутка наверх при переключении
+            window.scrollTo(0, 0);
+        }
+
+        // Базовая инициализация (LocalStorage)
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("Padel Riga Tracker Initialized");
+            // Тут в будущем будет загрузка из LocalStorage [cite: 31]
+        });
+    </script>
 </body>
 </html>
