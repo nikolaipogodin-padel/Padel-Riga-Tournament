@@ -1,49 +1,64 @@
 :root {
-  --lime: #d9ff00;
-  --dark-bg: #05070a;
-  --glass: rgba(255, 255, 255, 0.03);
-  --glass-border: rgba(255, 255, 255, 0.08);
+    --padel-neon: #BFFF00;
+    --bg-dark: #0A0A0A;
+    --card-bg: #1A1A1A;
 }
 
-body { background-color: var(--dark-bg); -webkit-tap-highlight-color: transparent; }
-
-.glass-card {
-  background: var(--glass);
-  backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
-  border-radius: 24px;
+body {
+    background-color: var(--bg-dark);
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    color: white;
 }
 
-.btn-primary {
-  background: var(--lime);
-  color: black;
-  font-weight: 700;
-  border-radius: 16px;
-  transition: all 0.2s ease;
+.premium-card {
+    background: var(--card-bg);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
 }
 
-.btn-primary:disabled {
-  background: #2a2d35;
-  color: #555;
-  cursor: not-allowed;
+.screen {
+    display: none;
+    min-height: calc(100vh - 80px);
 }
 
-.nav-btn.active { opacity: 1; color: var(--lime); }
-
-.input-field {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid var(--glass-border);
-  border-radius: 14px;
-  padding: 12px 16px;
-  width: 100%;
-  outline: none;
-  transition: border-color 0.2s;
+.screen.active {
+    display: block;
 }
 
-.input-field:focus { border-color: var(--lime); }
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+.bottom-nav {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 80px;
+    background: rgba(15, 15, 15, 0.95);
+    backdrop-filter: blur(20px);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: env(safe-area-inset-bottom);
 }
-.animate-fade { animation: fadeIn 0.4s ease forwards; }
+
+.nav-item {
+    font-size: 24px;
+    opacity: 0.3;
+    transition: 0.3s;
+    background: none;
+    border: none;
+}
+
+.nav-item.active {
+    opacity: 1;
+    color: var(--padel-neon);
+    filter: drop-shadow(0 0 8px var(--padel-neon));
+}
+
+.pulse {
+    animation: pulse-animation 2s infinite;
+}
+
+@keyframes pulse-animation {
+    0% { opacity: 1; }
+    50% { opacity: 0.4; }
+    100% { opacity: 1; }
+}
