@@ -2,235 +2,83 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Padel Riga Tracker</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --padel-neon: #BFFF00;
-            --bg-dark: #0A0A0A;
-            --card-bg: #1A1A1A;
-            --card-border: rgba(255, 255, 255, 0.08);
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-dark);
-            color: white;
-            margin: 0;
-            -webkit-tap-highlight-color: transparent;
-            overflow-x: hidden;
-        }
-
-        .premium-card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 20px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .active-match {
-            border-color: var(--padel-neon);
-            box-shadow: 0 0 20px rgba(191, 255, 0, 0.1);
-        }
-
+        :root { --padel-neon: #BFFF00; --bg-dark: #0A0A0A; --card-bg: #1A1A1A; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-dark); color: white; -webkit-tap-highlight-color: transparent; }
+        .premium-card { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; }
         .neon-text { color: var(--padel-neon); }
         .neon-bg { background-color: var(--padel-neon); color: black; }
-        
-        .neon-btn {
-            background-color: var(--padel-neon);
-            color: black;
-            font-weight: 800;
-            text-transform: uppercase;
-            border-radius: 14px;
-        }
-
-        .live-indicator {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(255, 59, 48, 0.15);
-            color: #FF3B30;
-            padding: 4px 10px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 800;
-        }
-
-        .pulse-dot {
-            width: 6px;
-            height: 6px;
-            background-color: #FF3B30;
-            border-radius: 50%;
-            animation: pulse-animation 1.5s infinite;
-        }
-
-        @keyframes pulse-animation {
-            0% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.4; transform: scale(1.2); }
-            100% { opacity: 1; transform: scale(1); }
-        }
-
-        .bottom-nav {
-            background: rgba(15, 15, 15, 0.9);
-            backdrop-filter: blur(20px);
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            padding-bottom: env(safe-area-inset-bottom);
-        }
-
-        .screen { display: none; min-height: 100vh; padding-bottom: 100px; }
-        .screen.active { display: block; animation: fadeIn 0.3s ease-out; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        input, select {
-            background: #1A1A1A !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            color: white !important;
-        }
-
-        /* Modal Blur */
-        #modal-overlay {
-            backdrop-filter: blur(8px);
-            background: rgba(0,0,0,0.8);
-        }
+        .pulse-dot { width: 6px; height: 6px; background-color: #FF3B30; border-radius: 50%; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        .bottom-nav { background: rgba(15,15,15,0.9); backdrop-filter: blur(20px); padding-bottom: env(safe-area-inset-bottom); border-top: 1px solid rgba(255,255,255,0.05); }
+        .screen { display: none; min-height: 100vh; padding-bottom: 120px; }
+        .screen.active { display: block; }
+        input, select { background: #1A1A1A!important; border: 1px solid rgba(255,255,255,0.1)!important; color: white!important; }
     </style>
 </head>
 <body>
 
     <header class="sticky top-0 z-40 px-6 py-5 bg-[#0A0A0A]/80 backdrop-blur-md flex justify-between items-center">
-        <div class="flex items-center gap-3">
-            <div class="w-9 h-9 neon-bg rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(191,255,0,0.2)]">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="10"/><path d="M8 12c4 0 4-4 8-4"/></svg>
-            </div>
+        <div class="flex items-center gap-3" id="app-logo">
+            <div class="w-9 h-9 neon-bg rounded-xl flex items-center justify-center font-black">P</div>
             <span class="text-xl font-black uppercase tracking-tighter">Padel <span class="neon-text">Riga</span></span>
         </div>
-        <div id="status-badge" class="hidden text-[10px] font-bold bg-white/5 px-3 py-1 rounded-full border border-white/10 uppercase tracking-widest text-gray-500">Online</div>
+        <div id="status-badge" class="hidden text-[10px] font-bold bg-white/5 px-3 py-1 rounded-full border border-white/10 uppercase text-gray-500">Online</div>
     </header>
 
     <main class="px-5">
-        
         <section id="screen-registration" class="screen active">
-            <div class="pt-6 pb-8">
-                <h2 class="text-3xl font-black mb-2">Добро пожаловать</h2>
-                <p class="text-gray-500 text-sm">Создайте профиль игрока для участия в турнирах.</p>
-            </div>
-            
+            <div class="pt-6 pb-8"><h2 class="text-3xl font-black mb-2">Вход</h2><p class="text-gray-500 text-sm">Введите данные для участия.</p></div>
             <div class="space-y-4">
                 <input type="text" id="reg-name" placeholder="Имя и Фамилия" class="w-full p-4 premium-card outline-none">
-                <input type="tel" id="reg-phone" placeholder="+371 20000000" class="w-full p-4 premium-card outline-none">
+                <input type="tel" id="reg-phone" placeholder="+371 ..." class="w-full p-4 premium-card outline-none">
                 <div class="flex gap-4">
-                    <select id="reg-level" class="flex-1 p-4 premium-card outline-none appearance-none">
-                        <option value="1">Уровень 1.0</option>
-                        <option value="2">Уровень 2.0</option>
-                        <option value="3">Уровень 3.0</option>
-                        <option value="4" selected>Уровень 4.0</option>
-                        <option value="5">Уровень 5.0</option>
-                    </select>
-                    <select id="reg-gender" class="flex-1 p-4 premium-card outline-none appearance-none">
-                        <option>Мужской</option>
-                        <option>Женский</option>
-                    </select>
+                    <select id="reg-level" class="flex-1 p-4 premium-card outline-none appearance-none"><option value="4">Уровень 4.0</option><option value="3">Уровень 3.0</option></select>
+                    <select id="reg-gender" class="flex-1 p-4 premium-card outline-none appearance-none"><option>Мужской</option><option>Женский</option></select>
                 </div>
-                <button onclick="handleRegistration()" class="w-full py-5 neon-btn mt-6 active:scale-[0.97] transition-transform shadow-lg shadow-[#BFFF00]/10">
-                    Зарегистрироваться
-                </button>
+                <button onclick="handleRegistration()" class="w-full py-5 neon-btn mt-6 font-black uppercase">Войти</button>
             </div>
         </section>
 
         <section id="screen-tournaments" class="screen">
-            <div class="flex justify-between items-end mb-6 pt-4">
-                <h2 class="text-2xl font-black">Турниры</h2>
-                <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Октябрь 2024</span>
-            </div>
-
+            <h2 class="text-2xl font-black mb-6 pt-4">Турниры</h2>
             <div class="space-y-5">
                 <div class="premium-card p-5 border-l-4 border-red-500" onclick="navigateTo('screen-live')">
                     <div class="flex justify-between items-start mb-4">
-                        <div class="live-indicator"><span class="pulse-dot"></span>Live</div>
-                        <span class="text-[10px] font-bold text-gray-500 uppercase">Корт 1-4</span>
+                        <div class="flex items-center gap-2 text-red-500 text-[10px] font-black"><span class="pulse-dot"></span>LIVE</div>
+                        <span class="text-[10px] text-gray-500 font-bold uppercase">Корты 1-4</span>
                     </div>
-                    <h3 class="text-xl font-bold mb-1">Evening Padel Cup</h3>
-                    <div class="flex items-center gap-4 text-[11px] text-gray-400 mb-5 font-medium uppercase">
-                        <span>🕒 20:00</span>
-                        <span>👥 16/16 Игроков</span>
-                    </div>
-                    <button class="w-full py-3 bg-white/5 border border-white/10 rounded-xl text-xs font-black uppercase tracking-wider">Смотреть Live</button>
-                </div>
-
-                <div class="premium-card p-5">
-                    <div class="flex justify-between items-start mb-4">
-                        <span class="text-[10px] font-bold bg-[#BFFF00]/10 text-[#BFFF00] px-3 py-1 rounded-full uppercase">Open</span>
-                        <span class="text-[10px] font-bold text-gray-500 uppercase">26 Oct, 10:00</span>
-                    </div>
-                    <h3 class="text-xl font-bold mb-1">Padel Weekend Riga</h3>
-                    <div class="flex items-center gap-4 text-[11px] text-gray-400 mb-5 font-medium uppercase">
-                        <span>📊 Ур. 3-5</span>
-                        <span>👥 12/16 Игроков</span>
-                    </div>
-                    <button class="w-full py-3 neon-bg rounded-xl text-xs font-black uppercase tracking-wider">Записаться</button>
+                    <h3 class="text-xl font-black mb-1 italic">Evening Padel Cup</h3>
+                    <p class="text-xs text-gray-400 mb-5 uppercase font-bold">16 Игроков • Round Robin</p>
+                    <button class="w-full py-3 bg-white/5 border border-white/10 rounded-xl text-[10px] font-black uppercase">Перейти в Live</button>
                 </div>
             </div>
         </section>
 
         <section id="screen-live" class="screen">
-            <div class="pt-4 mb-6">
-                <div class="flex items-center gap-2 mb-1">
-                    <div class="pulse-dot"></div>
-                    <span class="text-[10px] font-bold text-red-500 uppercase tracking-widest italic">Текущий матч</span>
-                </div>
-                <h2 class="text-2xl font-black italic uppercase">Evening Padel Cup</h2>
-            </div>
-
-            <div class="premium-card p-5 active-match mb-8 relative overflow-hidden">
-                <div class="absolute top-0 right-0 p-3">
-                    <span class="text-[10px] font-black text-[#BFFF00] bg-[#BFFF00]/10 px-2 py-0.5 rounded">ТУР 2</span>
-                </div>
-                <p class="text-[10px] font-black text-[#BFFF00] uppercase tracking-widest mb-4 opacity-80">Твой корт</p>
-                
+            <h2 class="text-2xl font-black mb-6 pt-4 italic uppercase">Evening Padel Cup</h2>
+            <div class="premium-card p-5 border-[#BFFF00] border-opacity-30 mb-8">
+                <p class="text-[10px] font-black neon-text uppercase tracking-widest mb-4">Твой матч</p>
                 <div class="flex justify-between items-center mb-6">
-                    <div class="flex-1">
-                        <div class="text-sm font-black" id="live-user-pair">Вы & Напарник</div>
-                        <div class="h-[1px] w-6 bg-white/10 my-3"></div>
-                        <div class="text-sm font-bold text-gray-500">К. Волков & О. Петрова</div>
+                    <div>
+                        <div class="text-sm font-black" id="user-match-name">Вы & Напарник</div>
+                        <div class="text-xs text-gray-500 my-2">vs</div>
+                        <div class="text-sm font-bold text-gray-300">К. Волков / О. Петрова</div>
                     </div>
-                    <div class="text-right">
-                        <div class="text-4xl font-black neon-text italic leading-none">#3</div>
-                        <div class="text-[10px] font-bold text-gray-600 uppercase mt-1">Корт</div>
-                    </div>
+                    <div class="text-right"><div class="text-4xl font-black neon-text italic">#3</div><p class="text-[10px] text-gray-600 font-bold uppercase">Корт</p></div>
                 </div>
-                
-                <div class="flex items-center justify-between border-t border-white/5 pt-4">
-                    <span class="text-[10px] font-bold text-gray-500 uppercase">Начало через 12 мин</span>
-                    <button onclick="openScoreModal()" class="text-[11px] font-black neon-text uppercase tracking-widest">Ввести счет →</button>
-                </div>
+                <button onclick="alert('Счет отправлен')" class="w-full py-3 bg-[#BFFF00]/10 border border-[#BFFF00]/20 rounded-xl text-[10px] font-black neon-text uppercase">Ввести результат</button>
             </div>
-
-            <h3 class="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-4 px-1 italic">Лидеры турнира (Round Robin)</h3>
+            <h3 class="text-[10px] font-black text-gray-500 uppercase mb-4 italic px-1">Таблица результатов</h3>
             <div class="premium-card overflow-hidden">
-                <table class="w-full text-left">
-                    <thead class="bg-white/5 text-[9px] font-black uppercase text-gray-500">
-                        <tr>
-                            <th class="p-4">Команда</th>
-                            <th class="p-4 text-center">П</th>
-                            <th class="p-4 text-center">+/-</th>
-                        </tr>
-                    </thead>
-                    <tbody id="leaderboard-body" class="divide-y divide-white/5 text-xs">
-                        <tr>
-                            <td class="p-4 font-bold">1. Иванов / Петров</td>
-                            <td class="p-4 text-center font-black neon-text text-sm">3</td>
-                            <td class="p-4 text-center text-gray-500">+12</td>
-                        </tr>
-                        <tr>
-                            <td class="p-4 font-bold text-gray-300">2. Берзиньш / Смит</td>
-                            <td class="p-4 text-center font-bold">2</td>
-                            <td class="p-4 text-center text-gray-500">+4</td>
-                        </tr>
+                <table class="w-full text-xs text-left"><thead class="bg-white/5 text-[9px] font-black uppercase text-gray-500"><tr><th class="p-4">Команда</th><th class="p-4 text-center">П</th><th class="p-4 text-center">+/-</th></tr></thead>
+                    <tbody class="divide-y divide-white/5">
+                        <tr><td class="p-4 font-bold">1. Иванов / Петров</td><td class="p-4 text-center font-black neon-text">3</td><td class="p-4 text-center text-gray-500">+12</td></tr>
+                        <tr><td class="p-4 font-bold text-gray-300">2. Вы / Напарник</td><td class="p-4 text-center font-bold">2</td><td class="p-4 text-center text-gray-500">+4</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -238,104 +86,42 @@
 
         <section id="screen-profile" class="screen">
             <div class="flex flex-col items-center pt-10 pb-8">
-                <div class="relative mb-6">
-                    <div class="w-24 h-24 rounded-[32px] bg-gradient-to-tr from-[#BFFF00] to-[#88B800] p-1.5 shadow-2xl shadow-[#BFFF00]/10">
-                        <div class="w-full h-full bg-[#0A0A0A] rounded-[26px] flex items-center justify-center text-4xl">🎾</div>
-                    </div>
-                    <div class="absolute -bottom-2 -right-2 bg-blue-500 text-[9px] font-black px-2 py-1 rounded-lg border-2 border-[#0A0A0A] uppercase tracking-wider">Active</div>
-                </div>
-                <h2 id="user-name-display" class="text-2xl font-black uppercase tracking-tight">Alexei Berzins</h2>
-                <p id="user-id-display" class="text-gray-600 text-[10px] font-black uppercase tracking-widest mt-1">ID: 90043 • Уровень 4</p>
+                <div class="w-20 h-20 rounded-3xl neon-bg flex items-center justify-center text-3xl mb-4 shadow-lg shadow-[#BFFF00]/20">👤</div>
+                <h2 id="p-name" class="text-2xl font-black uppercase tracking-tight">Name</h2>
+                <p id="p-id" class="text-gray-600 text-[10px] font-black uppercase mt-1 tracking-widest">ID: 00000</p>
             </div>
-
             <div class="grid grid-cols-2 gap-4 mb-8">
-                <div class="premium-card p-5 text-center">
-                    <div class="text-2xl font-black neon-text">24</div>
-                    <div class="text-[9px] font-black text-gray-600 uppercase mt-1 tracking-widest">Матчей</div>
-                </div>
-                <div class="premium-card p-5 text-center">
-                    <div class="text-2xl font-black neon-text">68%</div>
-                    <div class="text-[9px] font-black text-gray-600 uppercase mt-1 tracking-widest">Побед</div>
-                </div>
+                <div class="premium-card p-5 text-center"><div class="text-2xl font-black neon-text">24</div><p class="text-[9px] font-black text-gray-600 uppercase mt-1">Матчей</p></div>
+                <div class="premium-card p-5 text-center"><div class="text-2xl font-black neon-text">68%</div><p class="text-[9px] font-black text-gray-600 uppercase mt-1">Побед</p></div>
             </div>
-
-            <button onclick="logout()" class="w-full py-4 text-red-500/80 text-[10px] font-black uppercase tracking-[0.2em] border border-red-500/10 rounded-2xl active:bg-red-500/5 transition-colors">
-                Выйти из системы
-            </button>
+            <button onclick="logout()" class="w-full py-4 text-red-500/80 text-[10px] font-black uppercase tracking-widest border border-red-500/10 rounded-2xl">Выйти</button>
         </section>
-
     </main>
 
-    <div id="score-modal" class="fixed inset-0 z-[60] hidden flex items-center justify-center p-6">
-        <div id="modal-overlay" class="absolute inset-0"></div>
-        <div class="premium-card w-full max-w-sm p-6 relative z-10 bg-[#1A1A1A]">
-            <h3 class="text-lg font-black uppercase mb-6 italic">Ввести результат</h3>
-            <div class="space-y-6">
-                <div class="flex items-center justify-between">
-                    <span class="text-xs font-bold uppercase">Ваша пара</span>
-                    <input type="number" id="score-mine" value="6" class="w-16 p-3 text-center text-xl font-black rounded-xl">
-                </div>
-                <div class="flex items-center justify-between">
-                    <span class="text-xs font-bold text-gray-500 uppercase">Соперники</span>
-                    <input type="number" id="score-opp" value="4" class="w-16 p-3 text-center text-xl font-black rounded-xl text-gray-400">
-                </div>
-                <div class="pt-4 flex gap-3">
-                    <button onclick="closeScoreModal()" class="flex-1 py-4 bg-white/5 rounded-xl text-[10px] font-black uppercase tracking-widest">Отмена</button>
-                    <button onclick="submitScore()" class="flex-1 py-4 neon-bg rounded-xl text-[10px] font-black uppercase tracking-widest">Сохранить</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <nav class="fixed bottom-0 left-0 right-0 bottom-nav h-20 flex justify-around items-center px-6 z-50">
-        <button onclick="navigateTo('screen-tournaments')" class="nav-link active flex flex-col items-center gap-1.5 opacity-40 transition-opacity" id="nav-tournaments">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22h10c0-1.76-.85-3.25-2.03-3.79-.5-.23-.97-.66-.97-1.21v-2.34c3.07-.37 5-3.03 5-5.32V4c0-1.1-.9-2-2-2H7c-1.1 0-2 .9-2 2v5.34c0 2.29 1.93 4.95 5 5.32Z"/></svg>
-            <span class="text-[8px] font-black uppercase tracking-widest">Турниры</span>
-        </button>
-        <button onclick="navigateTo('screen-live')" class="nav-link flex flex-col items-center gap-1.5 opacity-40 transition-opacity" id="nav-live">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 10 10M12 22a10 10 0 0 1-10-10"/></svg>
-            <span class="text-[8px] font-black uppercase tracking-widest">Live</span>
-        </button>
-        <button onclick="navigateTo('screen-profile')" class="nav-link flex flex-col items-center gap-1.5 opacity-40 transition-opacity" id="nav-profile">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            <span class="text-[8px] font-black uppercase tracking-widest">Профиль</span>
-        </button>
+        <button onclick="navigateTo('screen-tournaments')" class="nav-btn opacity-40 flex flex-col items-center gap-1" id="nav-tournaments">🏆<span class="text-[8px] font-black uppercase">Турниры</span></button>
+        <button onclick="navigateTo('screen-live')" class="nav-btn opacity-40 flex flex-col items-center gap-1" id="nav-live">🎾<span class="text-[8px] font-black uppercase">Live</span></button>
+        <button onclick="navigateTo('screen-profile')" class="nav-btn opacity-40 flex flex-col items-center gap-1" id="nav-profile">👤<span class="text-[8px] font-black uppercase">Профиль</span></button>
     </nav>
 
     <script>
-        const state = {
-            user: JSON.parse(localStorage.getItem('padel_user')) || null,
-            leaderboard: [
-                { team: 'Иванов / Петров', wins: 3, diff: '+12' },
-                { team: 'Берзиньш / Смит', wins: 2, diff: '+4' }
-            ]
-        };
+        const state = { user: JSON.parse(localStorage.getItem('padel_user')) || null };
 
-        function navigateTo(screenId) {
-            if (!state.user && screenId !== 'screen-registration') return;
-            
+        function navigateTo(id) {
+            if (!state.user && id !== 'screen-registration') return;
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
-            
-            document.querySelectorAll('.nav-link').forEach(l => l.style.opacity = '0.4');
-            const activeNav = document.getElementById('nav-' + screenId.split('-')[1]);
-            if (activeNav) {
-                activeNav.style.opacity = '1';
-                activeNav.classList.add('neon-text');
-            }
-            window.scrollTo(0, 0);
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('neon-text', 'opacity-100'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.add('opacity-40'));
+            const activeNav = document.getElementById('nav-' + id.split('-')[1]);
+            if (activeNav) { activeNav.classList.add('neon-text', 'opacity-100'); activeNav.classList.remove('opacity-40'); }
+            window.scrollTo(0,0);
         }
 
         function handleRegistration() {
             const name = document.getElementById('reg-name').value;
-            const phone = document.getElementById('reg-phone').value;
-            if (name.length < 3 || !phone.includes('+')) return alert('Пожалуйста, заполните все поля корректно.');
-
-            state.user = { 
-                id: Math.floor(10000 + Math.random() * 90000), 
-                name: name, 
-                level: document.getElementById('reg-level').value 
-            };
+            if (name.length < 2) return alert('Введите имя');
+            state.user = { name, id: Math.floor(10000+Math.random()*90000), level: document.getElementById('reg-level').value };
             localStorage.setItem('padel_user', JSON.stringify(state.user));
             updateUI();
             navigateTo('screen-tournaments');
@@ -343,39 +129,16 @@
 
         function updateUI() {
             if (state.user) {
-                document.getElementById('user-name-display').textContent = state.user.name;
-                document.getElementById('user-id-display').textContent = `ID: ${state.user.id} • Уровень ${state.user.level}`;
+                document.getElementById('p-name').textContent = state.user.name;
+                document.getElementById('p-id').textContent = `ID: ${state.user.id} • УРОВЕНЬ ${state.user.level}`;
+                document.getElementById('user-match-name').textContent = state.user.name.split(' ')[0] + ' & Напарник';
                 document.getElementById('status-badge').classList.remove('hidden');
-                document.getElementById('live-user-pair').textContent = state.user.name.split(' ')[0] + ' & Напарник';
             }
         }
 
-        function openScoreModal() { document.getElementById('score-modal').classList.remove('hidden'); }
-        function closeScoreModal() { document.getElementById('score-modal').classList.add('hidden'); }
+        function logout() { localStorage.clear(); location.reload(); }
 
-        function submitScore() {
-            const myScore = parseInt(document.getElementById('score-mine').value);
-            const oppScore = parseInt(document.getElementById('score-opp').value);
-            
-            if (myScore > oppScore) {
-                state.leaderboard[0].wins += 1; // Условно обновляем первую пару для демо
-            }
-            
-            closeScoreModal();
-            alert('Счет сохранен и отправлен на подтверждение соперникам.');
-        }
-
-        function logout() {
-            localStorage.clear();
-            location.reload();
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            if (state.user) {
-                updateUI();
-                navigateTo('screen-tournaments');
-            }
-        });
+        document.addEventListener('DOMContentLoaded', () => { if (state.user) { updateUI(); navigateTo('screen-tournaments'); } });
     </script>
 </body>
     </html>
