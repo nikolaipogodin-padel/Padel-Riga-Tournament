@@ -1,34 +1,60 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Padel Riga Tracker</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Padel Riga Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-black text-white font-sans overflow-x-hidden">
-  <div id="app" class="min-h-screen flex flex-col pb-24">
-    </div>
+<body>
 
-  <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 bg-opacity-90 bg-gray-900 border-t border-gray-800 pb-6 pt-3 px-6 flex justify-between items-center z-50 backdrop-blur-lg hidden">
-    <button onclick="window.router.navigate('dashboard')" class="nav-btn flex flex-col items-center gap-1 opacity-50" data-screen="dashboard">
-      <div class="w-6 h-6 flex items-center justify-center">🏆</div>
-      <span class="text-[10px] font-medium uppercase tracking-widest">Турниры</span>
-    </button>
-    <button onclick="window.router.navigate('live')" class="nav-btn flex flex-col items-center gap-1 opacity-50" data-screen="live">
-      <div class="w-6 h-6 flex items-center justify-center relative">
-        <div class="absolute -top-1 -right-1 w-2 h-2 bg-lime-400 rounded-full animate-pulse"></div>
-        🎾
-      </div>
-      <span class="text-[10px] font-medium uppercase tracking-widest">Live</span>
-    </button>
-    <button onclick="window.router.navigate('profile')" class="nav-btn flex flex-col items-center gap-1 opacity-50" data-screen="profile">
-      <div class="w-6 h-6 flex items-center justify-center">👤</div>
-      <span class="text-[10px] font-medium uppercase tracking-widest">Профиль</span>
-    </button>
-  </nav>
+    <header class="sticky top-0 z-40 px-6 py-5 bg-[#0A0A0A]/80 backdrop-blur-md flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 bg-[#BFFF00] rounded-xl flex items-center justify-center font-black text-black shadow-[0_0_15px_rgba(191,255,0,0.3)]">P</div>
+            <span class="text-xl font-black uppercase tracking-tighter text-white">Padel <span class="text-[#BFFF00]">Riga</span></span>
+        </div>
+        <div id="status-badge" class="hidden text-[10px] font-bold bg-white/5 px-3 py-1 rounded-full border border-white/10 uppercase tracking-widest text-gray-500">Live Sync</div>
+    </header>
 
-  <script src="app.js"></script>
+    <main id="app-container">
+        <section id="screen-registration" class="screen">
+            <div class="p-6">
+                <h2 class="text-3xl font-black mb-2 text-white">Регистрация</h2>
+                <div class="space-y-4 mt-6">
+                    <input type="text" id="reg-name" placeholder="Имя Фамилия" class="w-full p-4 premium-card outline-none text-white">
+                    <input type="tel" id="reg-phone" placeholder="+371..." class="w-full p-4 premium-card outline-none text-white">
+                    <button onclick="auth.signUp()" id="reg-btn" class="w-full py-5 bg-[#BFFF00] text-black font-black rounded-2xl uppercase mt-4 active:scale-95 transition-transform">Начать играть</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="screen-tournaments" class="screen">
+            <div class="p-6">
+                <h2 class="text-2xl font-black uppercase text-white mb-6">Турниры</h2>
+                <div id="tournament-list" class="space-y-4">
+                    </div>
+            </div>
+        </section>
+
+        <section id="screen-profile" class="screen">
+            <div class="flex flex-col items-center pt-10 pb-8">
+                <div class="w-20 h-20 rounded-3xl bg-[#BFFF00] flex items-center justify-center text-3xl mb-4 shadow-lg shadow-[#BFFF00]/20">👤</div>
+                <h2 id="p-name" class="text-2xl font-black uppercase text-white">Загрузка...</h2>
+                <p id="p-id" class="text-gray-600 text-[10px] font-black uppercase mt-1 tracking-widest italic">ID: ---</p>
+            </div>
+            <div class="px-6">
+                <button onclick="auth.logout()" class="w-full py-4 text-red-500/80 text-[10px] font-black uppercase tracking-widest border border-red-500/10 rounded-2xl">Выйти из аккаунта</button>
+            </div>
+        </section>
+    </main>
+
+    <nav class="bottom-nav">
+        <button class="nav-item" id="nav-tournaments" onclick="ui.navigate('screen-tournaments')">🏆</button>
+        <button class="nav-item" id="nav-profile" onclick="ui.navigate('screen-profile')">👤</button>
+    </nav>
+
+    <script src="app.js"></script>
 </body>
 </html>
