@@ -1,59 +1,34 @@
-:root {
-    --neon-purple: #bc13fe;
-    --neon-cyan: #0ff0fc;
-    --neon-lime: #dfff11; /* Из эталонных экранов */
-    --card-bg: #1e1e1e;
-}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Padel Riga Tracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="bg-black text-white font-sans overflow-x-hidden">
+  <div id="app" class="min-h-screen flex flex-col pb-24">
+    </div>
 
-body {
-    font-family: 'Inter', system-ui, sans-serif;
-    background: radial-gradient(circle at top right, #1a1a2e, #0f0f0f);
-}
+  <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 bg-opacity-90 bg-gray-900 border-t border-gray-800 pb-6 pt-3 px-6 flex justify-between items-center z-50 backdrop-blur-lg hidden">
+    <button onclick="window.router.navigate('dashboard')" class="nav-btn flex flex-col items-center gap-1 opacity-50" data-screen="dashboard">
+      <div class="w-6 h-6 flex items-center justify-center">🏆</div>
+      <span class="text-[10px] font-medium uppercase tracking-widest">Турниры</span>
+    </button>
+    <button onclick="window.router.navigate('live')" class="nav-btn flex flex-col items-center gap-1 opacity-50" data-screen="live">
+      <div class="w-6 h-6 flex items-center justify-center relative">
+        <div class="absolute -top-1 -right-1 w-2 h-2 bg-lime-400 rounded-full animate-pulse"></div>
+        🎾
+      </div>
+      <span class="text-[10px] font-medium uppercase tracking-widest">Live</span>
+    </button>
+    <button onclick="window.router.navigate('profile')" class="nav-btn flex flex-col items-center gap-1 opacity-50" data-screen="profile">
+      <div class="w-6 h-6 flex items-center justify-center">👤</div>
+      <span class="text-[10px] font-medium uppercase tracking-widest">Профиль</span>
+    </button>
+  </nav>
 
-/* Card-first interface [cite: 63] */
-.card {
-    background: var(--card-bg);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 20px; /*  */
-    padding: 16px;
-    margin-bottom: 16px;
-    transition: transform 0.2s;
-}
-
-/* Inputs & Validation [cite: 41, 47] */
-input {
-    background: #2a2a2a;
-    border: 1px solid transparent;
-    border-radius: 12px;
-    padding: 12px 16px;
-    width: 100%;
-    color: white;
-}
-
-input:focus {
-    border-color: var(--neon-lime);
-    outline: none;
-}
-
-.error-msg {
-    color: #ff4d4d;
-    font-size: 12px;
-    margin-top: 4px;
-}
-
-/* Кнопка с состоянием disabled [cite: 42] */
-.btn-primary {
-    background: var(--neon-lime);
-    color: black;
-    font-weight: 700;
-    border-radius: 24px;
-    padding: 14px;
-    width: 100%;
-    transition: opacity 0.3s;
-}
-
-.btn-primary:disabled {
-    background: #333;
-    color: #666;
-    cursor: not-allowed;
-}
+  <script src="app.js"></script>
+</body>
+</html>
