@@ -1,0 +1,50 @@
+:root {
+    --padel-neon: #BFFF00;
+    --bg-dark: #0A0A0A;
+    --card-bg: #1A1A1A;
+}
+
+body {
+    background-color: var(--bg-dark);
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+}
+
+.premium-card {
+    background: var(--card-bg);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+}
+
+.screen {
+    display: none;
+    min-height: calc(100vh - 80px);
+}
+
+.screen.active {
+    display: block;
+}
+
+.bottom-nav {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 80px;
+    background: rgba(15, 15, 15, 0.9);
+    backdrop-filter: blur(20px);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+.nav-item {
+    font-size: 24px;
+    opacity: 0.4;
+    transition: 0.3s;
+}
+
+.nav-item.active {
+    opacity: 1;
+    filter: drop-shadow(0 0 5px var(--padel-neon));
+}
