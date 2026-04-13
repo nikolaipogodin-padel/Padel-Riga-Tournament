@@ -20,28 +20,49 @@
 
     <main id="app-container">
         <section id="screen-registration" class="screen">
-            <div class="p-6">
-                <h2 class="text-3xl font-black mb-2 text-white">Регистрация</h2>
-                <div class="space-y-4 mt-6">
-                    <input type="text" id="reg-name" placeholder="Имя Фамилия" class="w-full p-4 premium-card outline-none text-white">
-                    <input type="tel" id="reg-phone" placeholder="+371..." class="w-full p-4 premium-card outline-none text-white">
-                    <button onclick="auth.signUp()" id="reg-btn" class="w-full py-5 bg-[#BFFF00] text-black font-black rounded-2xl uppercase mt-4 active:scale-95 transition-transform">Начать играть</button>
+            <div class="p-6 pt-2">
+                <div class="space-y-4">
+                    <div class="flex gap-3">
+                        <input type="text" id="reg-firstname" placeholder="Имя" autocomplete="given-name" class="flex-1 p-4 premium-card outline-none text-white">
+                        <input type="text" id="reg-lastname" placeholder="Фамилия" autocomplete="family-name" class="flex-1 p-4 premium-card outline-none text-white">
+                    </div>
+                    
+                    <div class="flex gap-3">
+                        <input type="text" value="+371" readonly class="w-20 p-4 premium-card outline-none text-gray-500 text-center">
+                        <input type="tel" id="reg-phone" placeholder="Номер телефона" autocomplete="tel-national" class="flex-1 p-4 premium-card outline-none text-white">
+                    </div>
+
+                    <div class="flex gap-3">
+                        <select id="reg-gender" class="flex-1 p-4 premium-card outline-none text-white appearance-none">
+                            <option value="" disabled selected>Пол</option>
+                            <option value="male">Мужской</option>
+                            <option value="female">Женский</option>
+                        </select>
+                        <select id="reg-level" class="flex-1 p-4 premium-card outline-none text-white appearance-none">
+                            <option value="4.0">Уровень 4.0</option>
+                            <option value="3.0">Уровень 3.0</option>
+                            <option value="5.0">Уровень 5.0</option>
+                        </select>
+                    </div>
+
+                    <input type="password" id="reg-password" placeholder="Пароль" autocomplete="new-password" class="w-full p-4 premium-card outline-none text-white">
+
+                    <button onclick="auth.signUp()" id="reg-btn" class="w-full py-5 bg-[#BFFF00] text-black font-black rounded-2xl uppercase mt-4 active:scale-95 transition-transform">Регистрация</button>
                 </div>
             </div>
         </section>
 
         <section id="screen-tournaments" class="screen">
             <div class="p-6">
-                <h2 class="text-2xl font-black uppercase text-white mb-6">Турниры</h2>
-                <div id="tournament-list" class="space-y-4">
-                    </div>
+                <h2 class="text-2xl font-black uppercase text-white mb-6 italic">Турниры</h2>
+                <div id="tournament-list" class="space-y-4"></div>
             </div>
         </section>
 
         <section id="screen-profile" class="screen">
             <div class="flex flex-col items-center pt-10 pb-8">
                 <div class="w-20 h-20 rounded-3xl bg-[#BFFF00] flex items-center justify-center text-3xl mb-4 shadow-lg shadow-[#BFFF00]/20">👤</div>
-                <h2 id="p-name" class="text-2xl font-black uppercase text-white">Загрузка...</h2>
+                <h2 id="p-name" class="text-2xl font-black uppercase text-white">---</h2>
                 <p id="p-id" class="text-gray-600 text-[10px] font-black uppercase mt-1 tracking-widest italic">ID: ---</p>
             </div>
             <div class="px-6">
