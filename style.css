@@ -24,6 +24,12 @@ body {
 
 .screen.active {
     display: block;
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .bottom-nav {
@@ -43,22 +49,20 @@ body {
     font-size: 24px;
     opacity: 0.3;
     transition: 0.3s;
-    background: none;
-    border: none;
+    background: none; border: none;
 }
 
 .nav-item.active {
     opacity: 1;
     color: var(--padel-neon);
-    filter: drop-shadow(0 0 8px var(--padel-neon));
 }
 
-.pulse {
-    animation: pulse-animation 2s infinite;
+select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1em;
 }
 
-@keyframes pulse-animation {
-    0% { opacity: 1; }
-    50% { opacity: 0.4; }
-    100% { opacity: 1; }
-}
+.pulse { animation: pulse-animation 2s infinite; }
+@keyframes pulse-animation { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
