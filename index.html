@@ -9,9 +9,9 @@
     <style>
         :root {
             --padel-neon: #BFFF00;
-            --bg-dark: #121212;
-            --card-bg: #1E1E1E;
-            --gray-text: #A0A0A0;
+            --bg-dark: #0A0A0A;
+            --card-bg: #1A1A1A;
+            --card-border: rgba(255, 255, 255, 0.08);
         }
 
         body {
@@ -19,176 +19,237 @@
             background-color: var(--bg-dark);
             color: white;
             margin: 0;
-            padding-bottom: 80px;
-            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* Premium Card Style */
+        /* Premium Card-first Concept */
         .premium-card {
             background: var(--card-bg);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-            transition: transform 0.2s ease;
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .premium-card:active {
-            transform: scale(0.98);
+        .premium-card.active-match {
+            border-color: var(--padel-neon);
+            box-shadow: 0 0 15px rgba(191, 255, 0, 0.15);
         }
 
-        /* Neon Accents */
-        .neon-border {
-            border: 1px solid var(--padel-neon);
-            box-shadow: 0 0 10px rgba(191, 255, 0, 0.2);
-        }
-
-        .neon-text {
-            color: var(--padel-neon);
-        }
-
+        /* Neon Elements */
+        .neon-text { color: var(--padel-neon); }
+        .neon-bg { background-color: var(--padel-neon); color: black; }
+        
         .neon-btn {
             background-color: var(--padel-neon);
             color: black;
-            font-weight: 700;
-            border-radius: 12px;
-            transition: all 0.3s ease;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-radius: 14px;
+            transition: transform 0.1s active;
         }
 
-        .neon-btn:hover {
-            box-shadow: 0 0 15px rgba(191, 255, 0, 0.5);
+        /* Live Pulsing Indicator */
+        .live-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 59, 48, 0.15);
+            color: #FF3B30;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
         }
 
-        /* Live Indicator Animation */
-        .live-pulse {
-            width: 8px;
-            height: 8px;
-            background-color: #ff4444;
+        .pulse-dot {
+            width: 6px;
+            height: 6px;
+            background-color: #FF3B30;
             border-radius: 50%;
-            display: inline-block;
-            margin-right: 6px;
-            animation: pulse 1.5s infinite;
+            animation: pulse-animation 1.5s infinite;
         }
 
-        @keyframes pulse {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(255, 68, 68, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 68, 68, 0); }
+        @keyframes pulse-animation {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(1.2); }
+            100% { opacity: 1; transform: scale(1); }
         }
 
-        /* Bottom Nav */
+        /* Bottom Nav Blur */
         .bottom-nav {
-            background: rgba(30, 30, 30, 0.8);
-            backdrop-filter: blur(10px);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(15, 15, 15, 0.85);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: env(safe-area-inset-bottom);
         }
 
-        .nav-item.active {
-            color: var(--padel-neon);
+        .nav-link { color: #666; transition: color 0.3s; }
+        .nav-link.active { color: var(--padel-neon); }
+
+        .screen { display: none; min-height: 100vh; padding-bottom: 100px; }
+        .screen.active { display: block; animation: fadeIn 0.4s ease-out; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .screen { display: none; }
-        .screen.active { display: block; }
+        input, select {
+            background: #1A1A1A !important;
+            border: 1px solid rgba(255, 255, 255, 0.05) !important;
+            color: white !important;
+        }
     </style>
 </head>
 <body>
 
-    <header class="p-6 flex justify-between items-center">
-        <div class="flex items-center gap-2">
-            <div class="w-8 h-8 neon-btn flex items-center justify-center rounded-full">🎾</div>
-            <h1 class="text-xl font-bold uppercase tracking-wider">Padel <span class="neon-text">Riga</span></h1>
+    <header class="sticky top-0 z-40 px-6 py-5 bg-[#0A0A0A]/80 backdrop-blur-md flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 neon-bg rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(191,255,0,0.3)]">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M8 12c4 0 4-4 8-4"/></svg>
+            </div>
+            <span class="text-xl font-black uppercase tracking-tighter">Padel <span class="neon-text">Riga</span></span>
         </div>
+        <div id="status-badge" class="hidden text-[10px] font-bold bg-white/5 px-3 py-1 rounded-full border border-white/10 uppercase tracking-widest text-gray-400">Online</div>
     </header>
 
-    <main id="app-container" class="px-5">
+    <main id="main-content" class="px-5">
         
         <section id="screen-registration" class="screen active">
-            <h2 class="text-2xl font-semibold mb-6">Регистрация</h2>
+            <div class="pt-4 pb-8">
+                <h2 class="text-3xl font-bold mb-2">Добро пожаловать</h2>
+                <p class="text-gray-500 text-sm">Создайте профиль игрока для участия в турнирах.</p>
+            </div>
+            
             <div class="space-y-4">
-                <input type="text" placeholder="Имя и Фамилия" class="w-full p-4 premium-card bg-transparent border-none focus:ring-1 focus:ring-[#BFFF00] outline-none">
-                <input type="tel" placeholder="+371 ..." class="w-full p-4 premium-card bg-transparent border-none outline-none">
-                <div class="flex gap-4">
-                    <select class="flex-1 p-4 premium-card bg-[#1E1E1E] border-none outline-none">
-                        <option>Уровень (1-5)</option>
-                        <option>1 - Новичок</option>
-                        <option>3 - Средний</option>
-                        <option>5 - Профи</option>
-                    </select>
-                    <select class="flex-1 p-4 premium-card bg-[#1E1E1E] border-none outline-none">
-                        <option>Пол</option>
-                        <option>Муж</option>
-                        <option>Жен</option>
-                    </select>
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-gray-500 ml-1 uppercase">Имя и Фамилия</label>
+                    <input type="text" id="reg-name" placeholder="Alexei Berzins" class="w-full p-4 premium-card outline-none focus:border-[#BFFF00]/50">
                 </div>
-                <button onclick="navigateTo('screen-tournaments')" class="w-full py-4 neon-btn mt-4 uppercase">Зарегистрироваться</button>
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-gray-500 ml-1 uppercase">Телефон</label>
+                    <input type="tel" id="reg-phone" placeholder="+371 20000000" class="w-full p-4 premium-card outline-none">
+                </div>
+                <div class="flex gap-4">
+                    <div class="flex-1 space-y-1">
+                        <label class="text-xs font-bold text-gray-500 ml-1 uppercase">Уровень</label>
+                        <select id="reg-level" class="w-full p-4 premium-card outline-none appearance-none">
+                            <option value="1">1.0 - Новичок</option>
+                            <option value="2">2.0 - Начальный</option>
+                            <option value="3">3.0 - Средний</option>
+                            <option value="4" selected>4.0 - Продвинутый</option>
+                            <option value="5">5.0 - Профи</option>
+                        </select>
+                    </div>
+                    <div class="flex-1 space-y-1">
+                        <label class="text-xs font-bold text-gray-500 ml-1 uppercase">Пол</label>
+                        <select id="reg-gender" class="w-full p-4 premium-card outline-none appearance-none">
+                            <option>Мужской</option>
+                            <option>Женский</option>
+                        </select>
+                    </div>
+                </div>
+                <button onclick="handleRegistration()" class="w-full py-5 neon-btn mt-6 shadow-lg shadow-[#BFFF00]/10 active:scale-[0.98]">
+                    Зарегистрироваться
+                </button>
             </div>
         </section>
 
         <section id="screen-tournaments" class="screen">
-            <h2 class="text-2xl font-semibold mb-6">Турниры</h2>
-            <div id="tournament-list" class="space-y-4">
-                <div class="premium-card p-5 neon-border" onclick="navigateTo('screen-live')">
-                    <div class="flex justify-between items-start mb-3">
-                        <span class="text-xs font-bold px-2 py-1 bg-red-600 rounded text-white"><span class="live-pulse"></span>LIVE</span>
-                        <span class="text-gray-400 text-sm">Корт 1-4</span>
+            <div class="flex justify-between items-end mb-6 pt-4">
+                <h2 class="text-2xl font-bold">Турниры</h2>
+                <div class="text-[10px] font-bold text-gray-500 uppercase">Октябрь 2024</div>
+            </div>
+
+            <div id="tournament-container" class="space-y-5">
+                <div class="premium-card p-5 border-l-4 border-red-500" onclick="navigateTo('screen-live')">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="live-indicator"><span class="pulse-dot"></span>Live</div>
+                        <span class="text-[11px] font-bold text-gray-500 tracking-tighter uppercase">Корт 1-4</span>
                     </div>
-                    <h3 class="text-lg font-bold">Evening Padel Cup</h3>
-                    <p class="text-sm text-gray-400 mb-4">Старт: 20:00 • 16/16 игроков</p>
-                    <button class="w-full py-2 border border-[#BFFF00] neon-text rounded-lg text-sm font-semibold">Смотреть Live</button>
+                    <h3 class="text-xl font-bold mb-1">Evening Padel Cup</h3>
+                    <div class="flex items-center gap-4 text-xs text-gray-400 mb-5">
+                        <span class="flex items-center gap-1">🕒 20:00</span>
+                        <span class="flex items-center gap-1">👥 16/16 игроков</span>
+                    </div>
+                    <button class="w-full py-3 bg-white/5 border border-white/10 rounded-xl text-sm font-bold uppercase tracking-wider hover:bg-white/10 transition-colors">
+                        Смотреть Live
+                    </button>
                 </div>
 
                 <div class="premium-card p-5">
-                    <div class="flex justify-between items-start mb-3">
-                        <span class="text-xs font-bold px-2 py-1 bg-[#BFFF00] rounded text-black uppercase">Open</span>
-                        <span class="text-gray-400 text-sm">26 Oct, 10:00</span>
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="text-[10px] font-bold bg-[#BFFF00]/10 text-[#BFFF00] px-3 py-1 rounded-full uppercase">Open</span>
+                        <span class="text-[11px] font-bold text-gray-500 tracking-tighter uppercase">26 Oct, 10:00</span>
                     </div>
-                    <h3 class="text-lg font-bold">Padel Weekend Riga</h3>
-                    <p class="text-sm text-gray-400 mb-4">Уровень 3-5 • 12/16 игроков</p>
-                    <button class="w-full py-2 neon-btn rounded-lg text-sm">Записаться</button>
+                    <h3 class="text-xl font-bold mb-1">Padel Weekend Riga</h3>
+                    <div class="flex items-center gap-4 text-xs text-gray-400 mb-5">
+                        <span class="flex items-center gap-1">📊 Ур. 3-5</span>
+                        <span class="flex items-center gap-1">👥 12/16 игроков</span>
+                    </div>
+                    <button class="w-full py-3 neon-bg rounded-xl text-sm font-bold uppercase tracking-wider active:scale-[0.98]">
+                        Записаться
+                    </button>
                 </div>
             </div>
         </section>
 
         <section id="screen-live" class="screen">
-            <div class="flex items-center justify-between mb-6">
-                <h2 class="text-2xl font-semibold">Evening Padel Cup</h2>
-                <span class="text-xs text-red-500 font-bold">LIVE</span>
+            <div class="pt-4 mb-6">
+                <div class="flex items-center gap-2 mb-1">
+                    <div class="pulse-dot"></div>
+                    <span class="text-xs font-bold text-red-500 uppercase tracking-widest">Текущий турнир</span>
+                </div>
+                <h2 class="text-2xl font-bold">Evening Padel Cup</h2>
             </div>
-            
-            <div class="premium-card p-5 mb-8 border-l-4 border-[#BFFF00]">
-                <p class="text-xs text-[#BFFF00] font-bold uppercase mb-2">Твой следующий матч</p>
-                <div class="flex justify-between items-center">
-                    <div class="text-sm">
-                        <div class="font-bold">Вы & Напарник</div>
-                        <div class="text-gray-500 py-1">vs</div>
-                        <div class="font-bold text-gray-300">К. Волков & О. Петрова</div>
+
+            <div class="premium-card p-5 active-match mb-8 relative">
+                <div class="absolute top-0 right-0 p-3">
+                    <span class="text-[10px] font-bold text-[#BFFF00] bg-[#BFFF00]/10 px-2 py-0.5 rounded">ТУР 2</span>
+                </div>
+                <p class="text-[10px] font-black text-[#BFFF00] uppercase tracking-widest mb-4">Твой следующий матч</p>
+                
+                <div class="flex justify-between items-center mb-6">
+                    <div class="flex-1">
+                        <div class="text-sm font-bold">Вы & Напарник</div>
+                        <div class="h-px w-8 bg-white/10 my-2"></div>
+                        <div class="text-sm font-medium text-gray-400">К. Волков & О. Петрова</div>
                     </div>
                     <div class="text-right">
-                        <div class="text-2xl font-bold">Корт №3</div>
-                        <div class="text-xs text-gray-400">Тур 2 из 7 (через 10 мин)</div>
+                        <div class="text-3xl font-black neon-text italic">#3</div>
+                        <div class="text-[10px] font-bold text-gray-500 uppercase tracking-tighter">Корт</div>
                     </div>
+                </div>
+                
+                <div class="flex items-center justify-between text-[11px] font-bold uppercase tracking-tighter text-gray-500 border-t border-white/5 pt-4">
+                    <span>Начало через 12 мин</span>
+                    <span class="neon-text">Ввести счет →</span>
                 </div>
             </div>
 
-            <h3 class="text-lg font-bold mb-4">Сетка (Round Robin)</h3>
-            <div class="premium-card overflow-hidden">
-                <table class="w-full text-sm text-left">
-                    <thead class="bg-[#2A2A2A] text-gray-400 uppercase text-xs">
+            <h3 class="text-sm font-bold uppercase tracking-widest text-gray-500 mb-4 px-1">Общая сетка (Round Robin)</h3>
+            <div class="premium-card overflow-hidden mb-6">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-white/5 text-[10px] font-bold uppercase text-gray-400">
                         <tr>
-                            <th class="p-3">Пара</th>
-                            <th class="p-3 text-center">П</th>
-                            <th class="p-3 text-center">Сеты</th>
+                            <th class="p-4">Пара</th>
+                            <th class="p-4 text-center">П</th>
+                            <th class="p-4 text-center">+/-</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-white/5">
+                    <tbody class="divide-y divide-white/5 text-sm">
                         <tr>
-                            <td class="p-3 font-medium">1. Иванов / Петров</td>
-                            <td class="p-3 text-center font-bold neon-text">3</td>
-                            <td class="p-3 text-center text-gray-400">+12</td>
+                            <td class="p-4 font-semibold">1. Иванов / Петров</td>
+                            <td class="p-4 text-center font-bold neon-text">3</td>
+                            <td class="p-4 text-center text-gray-400">+12</td>
                         </tr>
                         <tr>
-                            <td class="p-3 font-medium text-gray-400">2. Берзиньш / Смит</td>
-                            <td class="p-3 text-center">2</td>
-                            <td class="p-3 text-center text-gray-400">+4</td>
+                            <td class="p-4 font-semibold">2. Берзиньш / Смит</td>
+                            <td class="p-4 text-center">2</td>
+                            <td class="p-4 text-center text-gray-400">+4</td>
                         </tr>
                     </tbody>
                 </table>
@@ -196,69 +257,108 @@
         </section>
 
         <section id="screen-profile" class="screen">
-            <div class="text-center py-8">
-                <div class="w-24 h-24 mx-auto mb-4 rounded-full neon-border p-1">
-                    <div class="w-full h-full bg-[#333] rounded-full flex items-center justify-center text-3xl">👤</div>
+            <div class="flex flex-col items-center pt-10 pb-8">
+                <div class="relative mb-4">
+                    <div class="w-24 h-24 rounded-3xl bg-gradient-to-tr from-[#BFFF00] to-[#88B800] p-1 shadow-2xl shadow-[#BFFF00]/20">
+                        <div class="w-full h-full bg-[#1A1A1A] rounded-[22px] flex items-center justify-center text-4xl">🎾</div>
+                    </div>
+                    <div class="absolute -bottom-2 -right-2 bg-blue-500 text-[10px] font-black px-2 py-1 rounded-lg border-2 border-[#0A0A0A] uppercase">Active</div>
                 </div>
-                <h2 class="text-2xl font-bold">Алексей Берзиньш</h2>
-                <p class="text-gray-500 text-sm">ID: 12345 • Уровень 4</p>
+                <h2 id="user-display-name" class="text-2xl font-black uppercase tracking-tight">Алексей Берзиньш</h2>
+                <p id="user-display-id" class="text-gray-500 text-xs font-bold uppercase tracking-widest mt-1">ID: 12345 • Уровень 4</p>
             </div>
-            
-            <div class="grid grid-cols-2 gap-4 mb-6">
-                <div class="premium-card p-4 text-center">
-                    <div class="text-2xl font-bold neon-text">24</div>
-                    <div class="text-xs text-gray-400 uppercase">Матчей</div>
+
+            <div class="grid grid-cols-2 gap-4 mb-8">
+                <div class="premium-card p-5 text-center">
+                    <div class="text-2xl font-black neon-text">24</div>
+                    <div class="text-[10px] font-bold text-gray-500 uppercase mt-1">Матчей</div>
                 </div>
-                <div class="premium-card p-4 text-center">
-                    <div class="text-2xl font-bold neon-text">68%</div>
-                    <div class="text-xs text-gray-400 uppercase">Побед</div>
+                <div class="premium-card p-5 text-center">
+                    <div class="text-2xl font-black neon-text">68%</div>
+                    <div class="text-[10px] font-bold text-gray-500 uppercase mt-1">Побед</div>
                 </div>
             </div>
 
-            <button onclick="location.reload()" class="w-full py-4 text-red-500 font-semibold border border-red-500/30 rounded-xl">Выйти из аккаунта</button>
+            <button onclick="logout()" class="w-full py-4 text-red-500 text-xs font-bold uppercase tracking-widest border border-red-500/20 rounded-2xl hover:bg-red-500/5 transition-colors">
+                Выйти из аккаунта
+            </button>
         </section>
 
     </main>
 
-    <nav class="fixed bottom-0 left-0 right-0 bottom-nav h-20 flex justify-around items-center px-4 z-50">
-        <button onclick="navigateTo('screen-tournaments')" class="nav-item active flex flex-col items-center gap-1">
-            <span class="text-xl">🏆</span>
-            <span class="text-[10px] uppercase font-bold">Турниры</span>
+    <nav class="fixed bottom-0 left-0 right-0 bottom-nav h-20 flex justify-around items-center px-6 z-50">
+        <button onclick="navigateTo('screen-tournaments')" class="nav-link active flex flex-col items-center gap-1.5" id="nav-tournaments">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22h10c0-1.76-.85-3.25-2.03-3.79-.5-.23-.97-.66-.97-1.21v-2.34c3.07-.37 5-3.03 5-5.32V4c0-1.1-.9-2-2-2H7c-1.1 0-2 .9-2 2v5.34c0 2.29 1.93 4.95 5 5.32Z"/></svg>
+            <span class="text-[9px] font-bold uppercase tracking-wider">Турниры</span>
         </button>
-        <button onclick="navigateTo('screen-live')" class="nav-item flex flex-col items-center gap-1">
-            <span class="text-xl">🎾</span>
-            <span class="text-[10px] uppercase font-bold">Live</span>
+        <button onclick="navigateTo('screen-live')" class="nav-link flex flex-col items-center gap-1.5" id="nav-live">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 10 10M12 22a10 10 0 0 1-10-10"/></svg>
+            <span class="text-[9px] font-bold uppercase tracking-wider">Live</span>
         </button>
-        <button onclick="navigateTo('screen-profile')" class="nav-item flex flex-col items-center gap-1">
-            <span class="text-xl">👤</span>
-            <span class="text-[10px] uppercase font-bold">Профиль</span>
+        <button onclick="navigateTo('screen-profile')" class="nav-link flex flex-col items-center gap-1.5" id="nav-profile">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span class="text-[9px] font-bold uppercase tracking-wider">Профиль</span>
         </button>
     </nav>
 
     <script>
-        // SPA Logic
+        // ENGINE & LOGIC
+        const state = {
+            user: JSON.parse(localStorage.getItem('padel_user')) || null,
+            currentScreen: 'screen-registration'
+        };
+
         function navigateTo(screenId) {
-            // Скрыть все экраны
+            if (!state.user && screenId !== 'screen-registration') {
+                return; // Запрет навигации без регистрации
+            }
+
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            // Показать нужный
             document.getElementById(screenId).classList.add('active');
             
-            // Обновить состояние навигации
-            document.querySelectorAll('.nav-item').forEach(nav => {
-                nav.classList.remove('active');
-                if(nav.getAttribute('onclick').includes(screenId)) {
-                    nav.classList.add('active');
-                }
-            });
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            const navMap = { 'screen-tournaments': 'nav-tournaments', 'screen-live': 'nav-live', 'screen-profile': 'nav-profile' };
+            if (navMap[screenId]) document.getElementById(navMap[screenId]).classList.add('active');
             
-            // Прокрутка наверх при переключении
+            state.currentScreen = screenId;
             window.scrollTo(0, 0);
         }
 
-        // Базовая инициализация (LocalStorage)
+        function handleRegistration() {
+            const name = document.getElementById('reg-name').value;
+            const phone = document.getElementById('reg-phone').value;
+            const level = document.getElementById('reg-level').value;
+
+            if (name.length < 3) return alert('Введите корректное имя');
+
+            state.user = { id: Math.floor(10000 + Math.random() * 90000), name, phone, level };
+            localStorage.setItem('padel_user', JSON.stringify(state.user));
+            
+            updateProfileUI();
+            navigateTo('screen-tournaments');
+            document.getElementById('status-badge').classList.remove('hidden');
+        }
+
+        function updateProfileUI() {
+            if (state.user) {
+                document.getElementById('user-display-name').textContent = state.user.name;
+                document.getElementById('user-display-id').textContent = `ID: ${state.user.id} • УРОВЕНЬ ${state.user.level}`;
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('padel_user');
+            state.user = null;
+            location.reload();
+        }
+
+        // Initialize
         document.addEventListener('DOMContentLoaded', () => {
-            console.log("Padel Riga Tracker Initialized");
-            // Тут в будущем будет загрузка из LocalStorage [cite: 31]
+            if (state.user) {
+                updateProfileUI();
+                navigateTo('screen-tournaments');
+                document.getElementById('status-badge').classList.remove('hidden');
+            }
         });
     </script>
 </body>
