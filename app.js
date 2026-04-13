@@ -1,32 +1,47 @@
-// 1. Инициализация Supabase
 const supabaseUrl = 'https://isioiadlnphqmjegltpj.supabase.co'
 const supabaseKey = 'sb_publishable_QAACxPWom-eMFOql9dNC6Q_2nxbDd65'
 const _supabase = supabase.createClient(supabaseUrl, supabaseKey)
 
-// 2. State
 const state = {
     user: JSON.parse(localStorage.getItem('padel_user')) || null
 }
 
-// 3. Auth
 const auth = {
     async signUp() {
-        const name = document.getElementById('reg-name').value
+        const firstName = document.getElementById('reg-firstname').value
+        const lastName = document.getElementById('reg-lastname').value
         const phone = document.getElementById('reg-phone').value
+        const gender = document.getElementById('reg-gender').value
+        const level = document.getElementById('reg-level').value
+        const password = document.getElementById('reg-password').value
         const btn = document.getElementById('reg-btn')
 
-        if (!name || !phone) return alert('Заполни поля!')
+        if (!firstName || !lastName || !phone || !password || !gender) {
+            return alert('Пожалуйста, заполни все поля')
+        }
 
-        btn.innerText = "Синхронизация..."
-        
+        btn.innerText = "Сохранение..."
+        btn.disabled = true
+
+        const fullName = `${firstName} ${lastName}`
+        const fullPhone = `+371${phone}`
+
         const { data, error } = await _supabase
             .from('players')
-            .insert([{ name, phone }])
+            .insert([{ 
+                name: fullName, 
+                phone: fullPhone, 
+                gender: gender, 
+                level: level,
+                // Пароль пока храним в открытом поле для MVP
+                created_at: new Date()
+            }])
             .select()
 
         if (error) {
-            alert('Ошибка БД')
-            btn.innerText = "Начать играть"
+            alert('Ошибка регистрации')
+            btn.innerText = "Регистрация"
+            btn.disabled = false
         } else {
             state.user = data[0]
             localStorage.setItem('padel_user', JSON.stringify(state.user))
@@ -37,7 +52,7 @@ const auth = {
     initApp() {
         if (state.user) {
             document.getElementById('p-name').innerText = state.user.name
-            document.getElementById('p-id').innerText = `ID: ${state.user.id}`
+            document.getElementById('p-id').innerText = `ID: ${state.user.id} • ${state.user.level}`
             document.getElementById('status-badge').classList.remove('hidden')
             ui.renderTournaments()
             ui.navigate('screen-tournaments')
@@ -52,7 +67,6 @@ const auth = {
     }
 }
 
-// 4. UI
 const ui = {
     navigate(screenId) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'))
@@ -67,20 +81,19 @@ const ui = {
     renderTournaments() {
         const list = document.getElementById('tournament-list')
         list.innerHTML = `
-            <div class="premium-card p-5 border-l-4 border-[#BFFF00] shadow-[0_0_20px_rgba(191,255,0,0.05)]">
+            <div class="premium-card p-5 border-l-4 border-[#BFFF00]">
                 <div class="flex justify-between items-center mb-3">
-                    <span class="text-[#BFFF00] text-[10px] font-black uppercase tracking-widest pulse">● Active now</span>
+                    <span class="text-[#BFFF00] text-[10px] font-black uppercase pulse">● Active now</span>
                     <span class="text-gray-500 text-[10px] font-bold">16/16 PLAYERS</span>
                 </div>
                 <h3 class="text-xl font-black italic uppercase text-white">Evening Padel Cup</h3>
                 <div class="mt-4 flex gap-2">
-                    <button class="flex-1 py-2 bg-[#BFFF00] text-black text-[10px] font-bold rounded-lg uppercase">Мой матч</button>
-                    <button class="flex-1 py-2 bg-white/5 text-white text-[10px] font-bold rounded-lg uppercase border border-white/10">Сетка</button>
+                    <button class="flex-1 py-3 bg-[#BFFF00] text-black text-[11px] font-black rounded-xl uppercase">Мой матч</button>
+                    <button class="flex-1 py-3 bg-white/5 text-white text-[11px] font-black rounded-xl uppercase border border-white/10">Сетка</button>
                 </div>
             </div>
         `
     }
 }
 
-// Start
 window.onload = () => auth.initApp()
